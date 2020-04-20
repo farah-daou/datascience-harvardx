@@ -150,7 +150,7 @@
 
 
 ### Assessments on edX
-### Section 2: Tidy Data - Reshaping Data
+### Section 2: Tidy Data - Reshaping Data (Part 1)
 
 ## Q1: A collaborator sends you a file containing data for three years of average race finish times.
 # age_group,2015,2016,2017
@@ -280,4 +280,262 @@
 # Answer: (a) while keeping the full variable names using the extra command.
 
 
+### Section 2: Tidy Data - Reshaping Data (Part 2)
+### Use the following libraries for these questions: library(tidyverse) + library(dslabs)
 
+## Q9: Examine the built-in dataset co2.
+## Q9: This dataset comes with base R, not dslabs - just type co2 to access the dataset.
+## Q9: Is co2 tidy? Why or why not?
+# (a) co2 is tidy data: it has one year for each row.
+# (b) co2 is tidy data: each column is a different month.
+# (c) co2 is not tidy: there are multiple observations per column.
+# (d1) co2 is not tidy: to be tidy we would have to wrangle it to have three columns (year, month and value),
+# (d2) and then each co2 observation would have a row.
+# Answer: (d)
+
+## Q10: Run the following command to define the co2_wide object:
+## co2_wide <- data.frame(matrix(co2, ncol = 12, byrow = TRUE)) %>% 
+    setNames(1:12) %>%
+    mutate(year = as.character(1959:1997))
+## Q10: Use the gather() function to make this dataset tidy. Call the column with the CO2 measurements co2 and call the month column month.
+## Q10: Name the resulting object co2_tidy. Which code would return the correct tidy format?
+# (a) co2_tidy <- gather(co2_wide,month,co2,year)
+# (b) co2_tidy <- gather(co2_wide,co2,month,-year)
+# (c) co2_tidy <- gather(co2_wide,co2,month,year)
+# (d) co2_tidy <- gather(co2_wide,month,co2,-year)
+# Answer: (d)      
+  
+## Q11: Use co2_tidy to plot CO2 versus month with a different curve for each year:
+## co2_tidy %>% ggplot(aes(as.numeric(month), co2, color = year)) + geom_line()
+## Q11: What can be concluded from this plot?
+# (a) CO2 concentrations increased monotonically (never decreased) from 1959 to 1997.
+# (b) CO2 concentrations are highest around May and the yearly average increased from 1959 to 1997.
+# (c) CO2 concentrations are highest around October and the yearly average increased from 1959 to 1997.
+# (d) Yearly average CO2 concentrations have remained constant over time.
+# (e) CO2 concentrations do not have a seasonal trend.
+# Answer: (b)
+  
+## Q12: Load the admissions dataset from dslabs, which contains college admission information
+## Q12: for men and women across six majors, and remove the applicants percentage column:  
+## library(dslabs)
+    data(admissions)
+    dat <- admissions %>% select(-applicants)
+## Your goal is to get the data in the shape that has one row for each major, like this:
+# major  men   women
+# A      62    82		
+# B      63    68		
+# C      37    34 
+## Q12: Which command could help you to wrangle the data into the desired format?
+# (a) dat_tidy <- spread(dat, major, admitted)
+# (b) dat_tidy <- spread(dat, gender, major)
+# (c) dat_tidy <- spread(dat, gender, admitted)
+# (d) dat_tidy <- spread(dat, admitted, gender)
+# Answer: (c)
+    
+## Q13: Now use the admissions dataset to create the object tmp, which has columns major, gender, key and value:
+## tmp <- gather(admissions, key, value, admitted:applicants)
+## tmp
+## Q13: Combine the key and gender and create a new column called column_name to get a variable with the following values:
+## Q13: admitted_men, admitted_women, applicants_men and applicants_women. Save the new data as tmp2.
+## Q13: Which command could help you to wrangle the data into the desired format?
+# (a) tmp2 <- spread(tmp, column_name, key, gender)
+# (b) tmp2 <- gather(tmp, column_name, c(gender,key))
+# (c) tmp2 <- unite(tmp, column_name, c(gender, key))
+# (d) tmp2 <- spread(tmp, column_name, c(key,gender))
+# (e) tmp2 <- unite(tmp, column_name, c(key, gender))     
+# Answer: (e)      
+    
+## Q14: Which function can reshape tmp2 to a table with six rows and five columns named major,
+## Q14: admitted_men, admitted_women, applicants_men and applicants_women?
+# (a) gather(); (b) spread(); (c) separate(); (d) unite()
+# Answer: (b)
+
+
+### Assessments on edX
+### Section 2: Tidy Data - Combining Tables
+    
+## Q1: You have created data frames tab1 and tab2 of state population and election data, similar to our module videos:
+# tab1
+# state   	     population
+# Alabama             4779736
+# Alaska     	         710231
+# Arizona    	        6392017
+# Delaware     	     897934
+# District of Columbia 601723
+# tab2
+# state  electoral_votes
+# Alabama      9
+# Alaska       3
+# Arizona     11
+# California  55
+# Colorado     9
+# Connecticut  7
+# dim(tab1)
+# [1] 5 2
+# dim(tab2)
+# [1] 6 2
+## Q1: What are the dimensions of the table dat, created by the following command?
+## dat <- left_join(tab1, tab2, by = “state”)
+# (a) 3 rows by 3 columns
+# (b) 5 rows by 2 columns
+# (c) 5 rows by 3 columns
+# (d) 6 rows by 3 columns
+# Answer: (c) When we use a left_join command, all rows in the left-hand table (in this case, tab1) are retained in the final table, so we expect to have five rows.
+# Answer: (c) In addition, columns from both tables will be included in the final “dat” table so we expect to have three columns.
+
+## Q2: We are still using the tab1 and tab2 tables shown in question 1. What join command would create a new table “dat” with three rows and two columns?
+# (a) dat <- right_join(tab1, tab2, by = “state”)
+# (b) dat <- full_join(tab1, tab2, by = “state”) 
+# (c) dat <- inner_join(tab1, tab2, by = “state”) 
+# (d) dat <- semi_join(tab1, tab2, by = “state”) 
+# Answer: (d) The semi_join command takes tab1 and limits it to states that are also in tab2, without adding the additional columns in tab2.
+# Answer: (d)This gives us three rows (states in both tables) and two columns (state and population, the two columns in tab1).
+    
+## Q3:Which of the following are real differences between the join and bind functions?
+## Q3: Please select all correct answers.
+# (a) Binding functions combine by position, while join functions match by variables.
+# (b) Joining functions can join datasets of different dimensions, but the bind functions must match on the appropriate dimension (either same row or column numbers).
+# (c) Bind functions can combine both vectors and dataframes, while join functions work for only for dataframes.
+# (d) The join functions are a part of the dplyr package and have been optimized for speed, while the bind functions are inefficient base functions.
+# Answer: (a) and (c) 
+    
+## Q4: We have two simple tables, shown below, with columns x and y:
+# df1
+# x     y    
+# a     a    
+# b     a    
+# df2
+# x     y    
+# a     a    
+# a     b  
+## Q4: Which command would result in the following table?
+# final
+# x     y    
+# b     a
+# (a) final <- union(df1, df2)
+# (b) final <- setdiff(df1, df2)
+# (c) final <- setdiff(df2, df1)
+# (d) final <- intersect(df1, df2)
+# Answer: (b) The setdiff() command returns rows in df1 but not df2, which matches our table final. 
+
+
+## Introduction to Questions 5-7
+## Install and load the Lahman library. This library contains a variety of datasets related to US professional baseball.
+## We will use this library for the next few questions and will discuss it more extensively in the Regression course. For now, focus on wrangling the data rather than understanding the statistics.
+## The Batting data frame contains the offensive statistics for all baseball players over several seasons.  Filter this data frame to define top as the top 10 home run (HR) hitters in 2016:
+## library(Lahman)
+    top <- Batting %>% 
+      filter(yearID == 2016) %>%
+      arrange(desc(HR)) %>%    # arrange by descending HR count
+      slice(1:10)    # take entries 1-10
+    top %>% as_tibble()
+    
+## Also Inspect the Master data frame, which has demographic information for all players:
+## Master %>% as_tibble()    
+
+## Q5: Use the correct join or bind function to create a combined table of the names and statistics of the top 10 home run (HR) hitters for 2016.
+## Q5: This table should have the player ID, first name, last name, and number of HR for the top 10 players. Name this data frame top_names.
+## Q5: Identify the join or bind that fills the blank in this code to create the correct table:
+## top_names <- top %>% ___________________ %>%
+      select(playerID, nameFirst, nameLast, HR)
+## Q5: Which bind or join function fills the blank to generate the correct table?
+# (a) rbind(Master); (b) cbind(Master); (c) left_join(Master) correct
+# (d) right_join(Master); (e) full_join(Master); (f) anti_join(Master)      
+# Answer: (c)
+# Answer: (c) top_names <- top %>% left_join(Master) %>% select(playerID, nameFirst, nameLast, HR)
+# Answer: (c) top_names
+      
+## Q6:Inspect the Salaries data frame. Filter this data frame to the 2016 salaries, then use the correct bind join function to add a salary column to the top_names
+## Q6: data frame from the previous question. Name the new data frame top_salary. Use this code framework:
+## top_salary <- Salaries %>% filter(yearID == 2016) %>%
+        ______________ %>%
+        select(nameFirst, nameLast, teamID, HR, salary)
+## Q6: Which bind or join function fills the blank to generate the correct table?
+# (a) rbind(top_names); (b) cbind(top_names); (c) left_join(top_names)
+# (d) right_join(top_names); (e) full_join(top_names): (f) anti_join(top_names)
+# Answer: (d)      
+      
+## Q7: Inspect the AwardsPlayers table. Filter awards to include only the year 2016.
+## Q7: How many players from the top 10 home run hitters won at least one award in 2016? Use a set operator.
+# Answer: 3      
+## Q7: How many players won an award in 2016 but were not one of the top 10 home run hitters in 2016? Use a set operator.
+# Answer: 44
+
+
+
+
+### Assessments on edX
+### Section 2: Tidy Data -  Web Scraping    
+
+## Introduction: Questions 1-3
+## Load the following web page, which contains information about Major League Baseball payrolls,
+## into R: https://web.archive.org/web/20181024132313/http://www.stevetheump.com/Payrolls.htm
+
+      ## library(rvest)
+## url <- "https://web.archive.org/web/20181024132313/http://www.stevetheump.com/Payrolls.htm"
+## h <- read_html(url)
+
+## We learned that tables in html are associated with the table node.  Use the html_nodes()
+## function and the table node type to extract the first table. Store it in an object nodes:
+## nodes <- html_nodes(h, "table")
+      
+## The html_nodes() function returns a list of objects of class xml_node. We can see the content of each one using, for example, the html_text() function.
+## You can see the content for an arbitrarily picked component like this:
+##  html_text(nodes[[8]])
+      
+##  If the content of this object is an html table, we can use the html_table() function to convert it to a data frame:
+##  html_table(nodes[[8]])
+##  You will analyze the tables from this HTML page over questions 1-3.     
+
+      
+## Q1: Many tables on this page are team payroll tables, with columns for rank, team, and one or more money values.
+## Q1: Convert the first four tables in nodes to data frames and inspect them.
+## Q1: Which of the first four nodes are tables of team payroll?
+## Q1: Check all correct answers. Look at table content, not column names.
+# (a) None of the above;(b) Table 1; (c) Table 2; (d) Table 3; (e) Table 4
+# Answer: (c), (d), and (e)
+      sapply(nodes[1:4], html_table)    # 2, 3, 4 give tables with payroll info
+      
+## Q2: For the last 3 components of nodes, which of the following are true? (Check all correct answers.)
+## Q2: Check all correct answers.
+# (a) All three entries are tables.
+# (b) All three entries are tables of payroll per team.
+# (c) The last entry shows the average across all teams through time, not payroll per team.
+# (d) None of the three entries are tables of payroll per team.      
+# Answer: (a) and (c)
+      html_table(nodes[[length(nodes)-2]])
+      html_table(nodes[[length(nodes)-1]])
+      html_table(nodes[[length(nodes)]])
+      
+## Q3: Create a table called tab_1 using entry 10 of nodes. Create a table called tab_2 using entry 19 of nodes.
+## Q3: Note that the column names should be c("Team", "Payroll", "Average"). You can see that these column names are actually in the first data row of each table,
+## Q3: and that tab_1 has an extra first column No. that should be removed so that the column names for both tables match.
+## Q3: Remove the extra column in tab_1, remove the first row of each dataset, and change the column names for each table to c("Team", "Payroll", "Average").
+## Q3: Use a full_join() by the Team to combine these two tables.
+## Q3: How many rows are in the joined data table?      
+# Answer: 58      
+      tab_1 <- html_table(nodes[[10]])
+      tab_2 <- html_table(nodes[[19]])
+      col_names <- c("Team", "Payroll", "Average")
+      tab_1 <- tab_1[-1, -1]
+      tab_2 <- tab_2[-1,]
+      names(tab_2) <- col_names
+      names(tab_1) <- col_names
+      full_join(tab_1,tab_2, by = "Team")     
+      
+## Introduction: Questions 4 and 5
+## The Wikipedia page on opinion polling for the Brexit referendum, in which the United Kingdom voted to leave the European Union in June 2016,
+## contains several tables. One table contains the results of all polls regarding the referendum over 2016:    
+## Use the rvest library to read the HTML from this Wikipedia page (make sure to copy both lines of the URL):     
+      library(rvest)
+      library(tidyverse)
+      url <- "https://en.wikipedia.org/w/index.php?title=Opinion_polling_for_the_United_Kingdom_European_Union_membership_referendum&oldid=896735054"
+
+## Q4: Assign tab to be the html nodes of the "table" class.
+## Q4: How many tables are in this Wikipedia page?
+# Answer: 39  
+      
+## Q5: Inspect the first several html tables using html_table() with the argument fill=TRUE (you can read about this argument in the documentation).
+## Q5: Find the first table that has 9 columns with the first column named "Date(s) conducted".
+## Q5:What is the first table number to have 9 columns where the first column is named "Date(s) conducted"?
+# Answer: 5
