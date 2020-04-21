@@ -5,16 +5,16 @@
 ### Assessments on edX
 ### Section 1: Data Import (Part 1)
 
-## Q1: Which of the following is NOT part of the data wrangling process?
+##Q1: Which of the following is NOT part of the data wrangling process?
 # (a) Importing data into R; (b) Formatting dates/times; (c) Checking correlations between your variables; (d) Tidying data
 # Answer: (c) Data analyses, such as checking correlations or creating visualizations, are done AFTER the data has been processed into a tidy format.
 
-## Q2: Which files could be opened in a basic text editor? Select ALL that apply.
+##Q2: Which files could be opened in a basic text editor? Select ALL that apply.
 # (a) data.txt; (b) data.csv; (c) data.xlsx; (d) data.tsv
 # Answer: (a), (b), and (c) because Microsoft Excel files (.xls) cannot be read with any basic text editor
 
-## Q3: You want to analyze a file containing race finish times for a recent marathon.
-## Q3: You open the file in a basic text editor and see lines that look like the following:
+##Q3: You want to analyze a file containing race finish times for a recent marathon.
+##Q3: You open the file in a basic text editor and see lines that look like the following:
 # initials,state,age,time
 # vib,MA,61,6:01
 # adc,TX,45,5:45
@@ -539,3 +539,420 @@
 ## Q5: Find the first table that has 9 columns with the first column named "Date(s) conducted".
 ## Q5:What is the first table number to have 9 columns where the first column is named "Date(s) conducted"?
 # Answer: 5
+
+
+     
+
+### Assessments on edX
+### Section 3: String Processing (Part 1)
+
+## Q1: Which of the following is NOT an application of string parsing?
+# (a) Removing unwanted characters from text.
+# (b) Extracting numeric values from text.
+# (c) Formatting numbers and characters so they can easily be displayed in deliverables like papers and presentations.
+# (d) Splitting strings into multiple values.
+# Answer: (c) Formatting text and numbers for deliverables is not an application of string parsing.
+# Answer: (c) String parsing is used as part of the data wrangling process.
+
+## Q2: Which of the following commands would not give you an error in R?
+# (a) cat(" LeBron James is 6’8\" ")
+# (b) cat(' LeBron James is 6'8" ')
+# (c) cat(` LeBron James is 6'8" `)
+# (d) cat(" LeBron James is 6\’8" ")
+# Answer: (a) This would correctly print out your string. Because the string is enclosed in double quotes,
+# Answer: (a) (“”), you must use an escape character before the inches symbol (“).
+      
+## Q3: Which of the following are advantages of the stringr package over string processing functions in base R? Select all that apply.
+# (a) Base R functions are rarely used for string processing by data scientists so it’s not worth learning them.
+# (b) Functions in stringr all start with “str_”, which makes them easy to look up using autocomplete.
+# (c) Stringr functions work better with pipes.
+# (d) The order of arguments is more consistent in stringr functions than in base R.
+# Answer: (b), (c), and (d)
+
+## Q4: You have a data frame of monthly sales and profits in R:
+# head(dat)
+# A tibble: 5 x 3
+# Month     Sales     Profit 
+# <chr>     <chr>     <chr>  
+# January   $128,568  $16,234
+# February  $109,523  $12,876
+# March     $115,468  $17,920
+# April     $122,274  $15,825
+# May       $117,921  $15,437
+## Q4: Which of the following commands could convert the sales and profits columns to numeric? Select all that apply.
+# (a) dat %>% mutate_at(2:3, parse_number)
+# (b) dat %>% mutate_at(2:3, as.numeric)
+# (c) dat %>% mutate_all(parse_number)
+# (d) dat %>% mutate_at(2:3, funs(str_replace_all(., c("\\$|,"), ""))) %>% 
+        mutate_at(2:3, as.numeric)
+# Answer: (a) and (d)
+# Answer: (a) You can use the parse_number command to remove all non-numeric characters. Combining this with the mutate_at command allows you to reformat column two and three (Sales and Profit).
+# Answer: (d) You can use the str_replace_all command to replace both the “$” and “,” characters, by specifying these in the “pattern” argument of the command. Combining this function with the mutate_at command allows you to reformat both column two and three (Sales and Profit). You then need to use the “as.numeric” command to convert these columns from character strings to numbers.
+        
+
+### Assessments on edX
+### Section 3: String Processing (Part 2)
+
+## Q1:In the video, we use the function not_inches to identify heights that were incorrectly entered
+  not_inches <- function(x, smallest = 50, tallest = 84) {
+    inches <- suppressWarnings(as.numeric(x))
+    ind <- is.na(inches) | inches < smallest | inches > tallest 
+    ind
+   }
+## Q1L In this function, what TWO types of values are identified as not being correctly formatted in inches?
+# (a) Values that specifically contain apostrophes (‘), periods (.) or quotations (“).
+# (b) Values that result in NA’s when converted to numeric
+# (c) Values less than 50 inches or greater than 84 inches
+# (d) Values that are stored as a character class, because most are already classed as numeric.
+# Answer: (b) and (c)
+  
+## Q2: Which of the following arguments, when passed to the function not_inches(), would return the vector c(FALSE)?
+# (a) c(175)
+# (b) c(“5’8\””)
+# (c) c(70)
+# (d)  c(85) (the height of Shaquille O'Neal in inches)
+# Answer: (c) The entry 70 can be converted to a numeric entry by as.numeric and is within the range that we set. Therefore, the result of this function would be FALSE (i.e., our entry is correctly formatted in inches).
+
+## Q3:Our function not_inches() returns the object ind. Which answer correctly describes ind?
+# (a) ind is a logical vector of TRUE and FALSE, equal in length to the vector x (in the arguments list). TRUE indicates that a height entry is incorrectly formatted.
+# (b) ind is a logical vector of TRUE and FALSE, equal in length to the vector x (in the arguments list). TRUE indicates that a height entry is correctly formatted.
+# (c) ind is a data frame like our reported_heights table but with an extra column of TRUE or FALSE. TRUE indicates that a height entry is incorrectly formatted.
+# (d) ind is a numeric vector equal to reported_heights$heights but with incorrectly formatted heights replaced with NAs.
+# Answer:(a) Our function returns a logical vector, with TRUE indicating that a height entry is incorrectly formatted and FALSE indicating that a height entry is formatted properly in inches. We then use this logical vector to filter our raw_heights data to only show incorrectly formatted entries.
+        
+## Q4: Given the following code
+# s
+#  [1] "70"       "5 ft"     "4'11"     ""         "."        "Six feet"
+## Q4: What pattern vector yields the following result?
+# str_view_all(s, pattern)
+# 70
+# 5 ft
+# 4’11
+#  .
+#  Six feet
+# (a) pattern <- "\\d|ft"
+# (b) pattern <- "\d|ft"
+# (c) pattern <- "\\d\\d|ft"
+# (d)  pattern <- "\\d|feet"
+# Answer:(a) This regex identifies any numeric characters or the text “ft”
+
+## Q5: You enter the following set of commands into your R console. What is your printed result?
+  animals <- c("cat", "puppy", "Moose", "MONKEY")
+  pattern <- "[a-z]"
+  str_detect(animals, pattern)
+  
+# (a)  TRUE
+# (b)  TRUE TRUE TRUE TRUE
+# (c)  TRUE TRUE TRUE FALSE
+# (d)  TRUE TRUE FALSE FALSE
+# Answer: (c) While your first three strings have at least one lowercase letter [a-z], the string MONKEY does not have any lowercase letters and will return a FALSE.
+        
+## Q6:You enter the following set of commands into your R console. What is your printed result?
+  animals <- c("cat", "puppy", "Moose", "MONKEY")
+  pattern <- "[A-Z]$"
+  str_detect(animals, pattern)
+# (a) FALSE FALSE FALSE FALSE
+# (b) FALSE FALSE TRUE TRUE
+# (c) FALSE FALSE FALSE TRUE
+# (d) TRUE TRUE TRUE FALSE
+# Answer: (c) Your regex pattern tells str_detect to look for an uppercase ([A-Z]) letter at the end of the string ($): this is only true for the string “MONKEY”.
+     
+## Q7:You enter the following set of commands into your R console. What is your printed result?
+  animals <- c("cat", "puppy", "Moose", "MONKEY")
+  pattern <- "[a-z]{4,5}"
+  str_detect(animals, pattern)
+# (a) FALSE TRUE TRUE FALSE
+# (b) TRUE TRUE FALSE FALSE
+# (c) FALSE FALSE FALSE TRUE
+# (d) TRUE TRUE TRUE FALSE
+# Answer: (a) Your regex command tells R to look for either 4 or 5 lowercase letters in a row anywhere in the string. This is true for the animals “puppy” and “Moose”.
+        
+## Q8: Given the following code:
+  animals <- c("moose", "monkey", "meerkat", "mountain lion")
+## Q8: Which TWO “pattern” vectors would yield the following result?
+#  str_detect(animals, pattern)
+#  [1] TRUE TRUE TRUE TRUE
+# (a) pattern <- “mo*”
+# (b) pattern <- “mo?”
+# (c) pattern <- “mo+”
+# (d) pattern <- “moo*” 
+# Answer: (a) and (b)
+# Answer: (a)This regex pattern looks for an “m” followed by zero or more “o” characters. This is true for all strings in the animal vector.
+# Answer: (b) This regex pattern looks for an “m” followed by zero or one “o” characters. This is true for all strings in the animal vector. Even though “moose” has two “o”s after the “m”, it still matches the pattern.
+        
+## Q9:You are working on some data from different universities. You have the following vector:
+# > schools
+# [1] "U. Kentucky"                 "Univ New Hampshire"          "Univ. of Massachusetts"      "University Georgia"         
+# [5] "U California"                "California State University"
+# You want to clean this data to match the full names of each university:
+# > final
+# [1] "University of Kentucky"      "University of New Hampshire" "University of Massachusetts" "University of Georgia"         
+# [5] "University of California"    "California State University"
+## Q9: What of the following commands could accomplish this?
+# (a) schools %>% 
+    str_replace("Univ\\.?|U\\.?", "University ") %>% 
+    str_replace("^University of |^University ", "University of ")
+# (b) schools %>% 
+    str_replace("^Univ\\.?\\s|^U\\.?\\s", "University ") %>% 
+    str_replace("^University of |^University ", "University of ")
+# (c) schools %>% 
+    str_replace("^Univ\\.\\s|^U\\.\\s", "University") %>% 
+    str_replace("^University of |^University ", "University of ")
+# (d) schools %>% 
+    str_replace("^Univ\\.?\\s|^U\\.?\\s", "University") %>% 
+    str_replace("University ", "University of ")
+# Answer: (b) This code properly replaces all versions of “U”, “U.”, “Univ” and “Univ.” with “University” and then adds the word “of”.
+        
+## Q10: Rather than using the pattern_with_groups vector from the video, you accidentally write in the following code:
+# problems <- c("5.3", "5,5", "6 1", "5 .11", "5, 12")
+# pattern_with_groups <- "^([4-7])[,\\.](\\d*)$"
+# str_replace(problems, pattern_with_groups, "\\1'\\2")
+## Q10: What is your result?
+# (a) [1] "5'3" "5'5" "6 1" "5 .11" "5, 12"
+# (b) [1] "5.3" "5,5" "6 1" "5 .11" "5, 12"
+# (c) [1] "5'3" "5'5" "6'1" "5 .11" "5, 12"
+# (d) [1] "5'3" "5'5" "6'1" "5’11" "5’12"
+# Answer: (a) Yes. You forgot to check for any spaces in your regex pattern. While the first two entries of “problems” have commas and periods correctly replaced, the last three entries are not identified as part of the pattern and are not replaced.
+        
+## Q11:You notice your mistake and correct your pattern regex to the following
+    problems <- c("5.3", "5,5", "6 1", "5 .11", "5, 12")
+    pattern_with_groups <- "^([4-7])[,\\.\\s](\\d*)$"
+    str_replace(problems, pattern_with_groups, "\\1'\\2")
+## Q11: What is your result?
+# (a) [1] "5'3" "5'5" "6 1" "5 .11" "5, 12"
+# (b) [1] "5.3" "5,5" "6 1" "5 .11" "5, 12"
+# (c) [1] "5'3" "5'5" "6'1" "5 .11" "5, 12"
+# (d) [1] "5'3" "5'5" "6'1" "5’11" "5’12"
+# Answer: (c) The new regex pattern now checks for one character, either a comma, period or space, between the first digit and the last one or two digits, and replaces it with an apostrophe (‘).
+# Answer: (c) However, because your last two problem strings have additional space between the digits, they are not corrected.
+        
+## Q12:In our example, we use the following code to detect height entries that do not match our pattern of x’y”:
+    converted <- problems %>% 
+      str_replace("feet|foot|ft", "'") %>% 
+      str_replace("inches|in|''|\"", "") %>% 
+      str_replace("^([4-7])\\s*[,\\.\\s+]\\s*(\\d*)$", "\\1'\\2")
+    
+    pattern <- "^[4-7]\\s*'\\s*\\d{1,2}$"
+    index <- str_detect(converted, pattern)
+    converted[!index]
+## Q12: Which answer best describes the differences between the regex string we use as an argument in str_replace("^([4-7])\\s*[,\\.\\s+]\\s*(\\d*)$", "\\1'\\2") and the regex string in pattern <- "^[4-7]\\s*'\\s*\\d{1,2}$"?
+# (a) The regex used in str_replace() looks for either a comma, period or space between the feet and inches digits, while the pattern regex just looks for an apostrophe; the regex in str_replace allows for one or more digits to be entered as inches, while the pattern regex only allows for one or two digits.
+# (b) The regex used in str_replace() allows for additional spaces between the feet and inches digits, but the pattern regex does not.
+# (c) The regex used in str_replace() looks for either a comma, period or space between the feet and inches digits, while the pattern regex just looks for an apostrophe; the regex in str_replace allows none or more digits to be entered as inches, while the pattern regex only allows for the number 1 or 2 to be used.
+# (d) The regex used in str_replace() looks for either a comma, period or space between the feet and inches digits, while the pattern regex just looks for an apostrophe; the regex in str_replace allows for none or more digits to be entered as inches, while the pattern regex only allows for one or two digits.
+# Answer: (d) This answer describes two important differences in the str_replace() regex and the pattern regex.
+
+## Q13:You notice a few entries that are not being properly converted using your str_replace() and str_detect() code:
+#  yes <- c("5 feet 7inches", “5 7”)
+    no <- c("5ft 9 inches", "5 ft 9 inches")
+    s <- c(yes, no)
+    
+#  converted <- s %>% 
+      str_replace("feet|foot|ft", "'") %>% 
+      str_replace("inches|in|''|\"", "") %>% 
+      str_replace("^([4-7])\\s*[,\\.\\s+]\\s*(\\d*)$", "\\1'\\2")
+    
+    pattern <- "^[4-7]\\s*'\\s*\\d{1,2}$"
+    str_detect(converted, pattern)
+#    [1]  TRUE TRUE FALSE FALSE
+## Q13: It seems like the problem may be due to spaces around the words feet|foot|ft and inches|in. What is another way you could fix this problem?
+# (a) converted <- s %>% 
+#    str_replace("\\s*(feet|foot|ft)\\s*", "'") %>% 
+#    str_replace("\\s*(inches|in|''|\")\\s*", "") %>% 
+ #   str_replace("^([4-7])\\s*[,\\.\\s+]\\s*(\\d*)$", "\\1'\\2")
+# (b) converted <- s %>% 
+#    str_replace("\\s+feet|foot|ft\\s+”, "'") %>% 
+#    str_replace("\\s+inches|in|''|\"\\s+", "") %>% 
+#    str_replace("^([4-7])\\s*[,\\.\\s+]\\s*(\\d*)$", "\\1'\\2")
+# (c) converted <- s %>% 
+#    str_replace("\\s*|feet|foot|ft", "'") %>% 
+#    str_replace("\\s*|inches|in|''|\"", "") %>% 
+#    str_replace("^([4-7])\\s*[,\\.\\s+]\\s*(\\d*)$", "\\1'\\2") 
+# (d) converted <- s %>% 
+#    str_replace_all(“\\s”, “”) %>% 
+#    str_replace("\\s|feet|foot|ft", "'") %>% 
+#    str_replace("\\s|inches|in|''|\"", "") %>% 
+#    str_replace("^([4-7])\\s*[,\\.\\s+]\\s*(\\d*)$", "\\1'\\2")
+# Answer: (a)
+# Answer: It is not (b) because
+# Answer: It is not (c) Try again. Your regex says to replace either a space OR the word you want to replace. For example, the text entry “5 feet 7inches” becomes “5’feet7inches” rather than “5’7””.
+# Answer: It is not (d) because
+    
+    
+### Assessments on edX
+### Section 3: String Processing (Part 3)
+    
+## Q1:
+# s <- c("5'10", "6'1\"", "5'8inches", "5'7.5")
+# tab <- data.frame(x = s)
+## Q1: If you use the extract code from our video, the decimal point is dropped. What modification of the code would allow you to put the decimals in a third column called “decimal”?
+# (a) extract(data = tab, col = x, into = c(“feet”, “inches”, “decimal”), 
+#      regex = "(\\d)'(\\d{1,2})(\\.)?"
+# (b) extract(data = tab, col = x, into = c("feet", "inches", "decimal"), 
+#      regex = "(\\d)'(\\d{1,2})(\\.\\d+)" 
+# (c) extract(data = tab, col = x, into = c("feet", "inches", "decimal"), 
+#      regex = "(\\d)'(\\d{1,2})\\.\\d+?"
+# (d) extract(data = tab, col = x, into = c("feet", "inches", "decimal"), 
+#      regex = "(\\d)'(\\d{1,2})(\\.\\d+)?")    
+# Answer: (d) In this code, you extract three groups: one digit for “feet”, one or two digits for “inches”, and an optional decimal point followed by at least one digit for “decimal”.
+
+## Q2: You have the following table, schedule:
+# schedule
+# day		staff
+# Monday		Mandy, Chris and Laura
+# Tuesday		Steve, Ruth and Frank
+# You want to turn this into a more useful data frame.
+## Q2: Which two commands would properly split the text in the “staff” column into each individual name? Select ALL that apply.
+# (a) str_split(schedule$staff, ",|and")
+# (b) str_split(schedule$staff, ", | and ")
+# (c) str_split(schedule$staff, ",\\s|\\sand\\s")
+# (d) str_split(schedule$staff, "\\s?(,|and)\\s?")
+# Answer: (b) and (c)
+# Answer: (b) This regex will correctly split each “staff” string into three names by properly accounting for the space after the comma as well as the spaces before and after the “and”, but it’s not the only one.
+# Answer: (c) This regex command is the same as the one above, except that the spaces are written as \\s, but it’s not the only one.
+
+## Q3:You have the following table, schedule:
+# > schedule
+# day         staff
+# Monday   	Mandy, Chris and Laura
+# Tuesday 	Steve, Ruth and Frank
+# What code would successfully turn your “Schedule” table into the following tidy table?
+
+# > tidy
+# day     staff
+# <chr>   <chr>
+# Monday  Mandy
+# Monday  Chris
+# Monday  Laura
+# Tuesday Steve
+# Tuesday Ruth 
+# Tuesday Frank
+
+# (a) tidy <- schedule %>% 
+      mutate(staff = str_split(staff, ", | and ")) %>% 
+      unnest()
+# (b) tidy <- separate(schedule, staff, into = c("s1","s2","s3"), sep = “,”) %>% 
+      gather(key = s, value = staff, s1:s3)
+# (c) tidy <- schedule %>% 
+      mutate(staff = str_split(staff, ", | and ", simplify = TRUE)) %>% 
+      unnest()
+# Answer: (a) The mutate command creates a column “staff”. Each row in the “staff” column is a character vector of length three, with the names of each staff member. We unnest this character vector using the unnest() function from tidyr.
+      
+## Q4: Using the gapminder data, you want to recode countries longer than 12 letters in the region “Middle Africa” to their abbreviations in a new column, “country_short”. Which code would accomplish this?
+# (a) dat <- gapminder %>% filter(region == "Middle Africa") %>% 
+      mutate(recode(country, 
+                      "Central African Republic" = "CAR", 
+                      "Congo, Dem. Rep." = "DRC",
+                      "Equatorial Guinea" = "Eq. Guinea"))
+# (b) dat <- gapminder %>% filter(region == "Middle Africa") %>% 
+      mutate(country_short = recode(country, 
+                                      c("Central African Republic", "Congo, Dem. Rep.", "Equatorial Guinea"),
+                                      c("CAR", "DRC", "Eq. Guinea")))
+# (c) dat <- gapminder %>% filter(region == "Middle Africa") %>% 
+      mutate(country = recode(country, 
+                                "Central African Republic" = "CAR", 
+                                "Congo, Dem. Rep." = "DRC",
+                                "Equatorial Guinea" = "Eq. Guinea"))
+# (d) dat <- gapminder %>% filter(region == "Middle Africa") %>% 
+      mutate(country_short = recode(country, 
+                                      "Central African Republic" = "CAR", 
+                                      "Congo, Dem. Rep." = "DRC",
+                                      "Equatorial Guinea" = "Eq. Guinea"))
+# Answer: (d) This code properly recodes each country in a new column “country_short”.
+
+
+## Instructions for Question 5 through8         
+# Import raw Brexit referendum polling data from Wikipedia:
+# library(rvest)
+# library(tidyverse)
+# library(stringr)
+# url <- "https://en.wikipedia.org/w/index.php?title=Opinion_polling_for_the_United_Kingdom_European_Union_membership_referendum&oldid=896735054"
+# tab <- read_html(url) %>% html_nodes("table")
+# polls <- tab[[5]] %>% html_table(fill = TRUE)
+# You will use a variety of string processing techniques learned in this section to reformat these data.
+
+## Q5: Some rows in this table do not contain polls. You can identify these by the lack of the percent sign (%) in the Remain column.
+## Q5: Update polls by changing the column names to c("dates", "remain", "leave", "undecided", "lead", "samplesize", "pollster", "poll_type", "notes") and only keeping rows that have a percent sign (%) in the remain column.
+## Q5: How many rows remain in the polls data frame?
+# Answer: 129
+# Code: names(polls) <- c("dates", "remain", "leave", "undecided", "lead", "samplesize", "pollster", "poll_type", "notes")
+        polls <- polls[str_detect(polls$remain, "%"), -9]
+        nrow(polls)
+      
+## Q6:The remain and leave columns are both given in the format "48.1%": percentages out of 100% with a percent symbol.
+## Q6: Which of these commands converts the remain vector to a proportion between 0 and 1?
+## Q6: Check all correct answers.
+# (a) as.numeric(str_remove(polls$remain, "%"))
+# (b) as.numeric(polls$remain)/100
+# (c) parse_number(polls$remain)
+# (d) str_remove(polls$remain, "%")/100
+# (e) as.numeric(str_replace(polls$remain, "%", ""))/100
+# (f) parse_number(polls$remain)/100
+# Answer: (e) and (f)
+      
+## Q7: The undecided column has some "N/A" values. These "N/A"s are only present when the remain and leave columns total 100%, so they should actually be zeros.
+## Q7: Use a function from stringr to convert "N/A" in the undecided column to 0. The format of your command should be function_name(polls$undecided, "arg1", "arg2").
+## Q7: What function replaces function_name?
+# Answer: str_replace  
+## Q7:What argument replaces arg1? Omit the quotation marks.       
+# Answer: N/A
+## Q7: What argument replaces arg2? Omit the quotation marks.
+# Answer: 0
+
+## Q8: The dates column contains the range of dates over which the poll was conducted. The format is "8-10 Jan" where the poll had a start date of 2016-01-08 and end date of 2016-01-10. Some polls go across month boundaries (16 May-12 June).
+## Q8: The end date of the poll will always be one or two digits, followed by a space, followed by the month as one or more letters (either capital or lowercase). In these data, all month abbreviations or names have 3, 4 or 5 letters.
+## Q8:Write a regular expression to extract the end day and month from dates. Insert it into the skeleton code below:
+# temp <- str_extract_all(polls$dates, _____)
+# end_date <- sapply(temp, function(x) x[length(x)]) # take last element (handles polls that cross month boundaries)
+# Which of the following regular expressions correctly extracts the end day and month when inserted into the blank in the code above?
+## Q8: Check all correct answers.
+# (a) "\\d?\\s[a-zA-Z]?"
+# (b) "\\d+\\s[a-zA-Z]+"
+# (c) "\\d+\\s[A-Z]+"
+# (d) "[0-9]+\\s[a-zA-Z]+"
+# (e) "\\d{1,2}\\s[a-zA-Z]+"
+# (f) "\\d{1,2}[a-zA-Z]+"
+# (g) "\\d+\\s[a-zA-Z]{3,5}"
+# Answer: (b), (d), (e), and (g)
+
+      
+      
+### Assessments on edX
+### Section 4: Dates, Times, and Text Mining
+
+# Use the following libraries and options for coding questions:
+# library(dslabs)
+# library(lubridate)
+# options(digits = 3)    # 3 significant digits
+# IMPORTANT: Some of these exercises use dslabs datasets that were added in a July 2019 update. Make sure your package is up to date with the command install.packages("dslabs").       
+        
+##Q1:Which of the following is the standard ISO 8601 format for dates?
+(a) MM-DD-YY
+(b) YYYY-MM-DD
+(c) YYYYMMDD
+(d) YY-MM-DD
+# Answer: (b) This is proper ISO 8601 formatting for dates.
+
+##Q2:
+        
+##Q3:
+        
+##Q4:
+        
+##Q5:
+        
+##Q6:
+        
+##Q7:
+        
+##Q8:
+        
+##Q9:
+        
+##Q10:
+        
+##Q11:
+        
+##Q12:
+        
+      
