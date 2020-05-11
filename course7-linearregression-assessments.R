@@ -1,9 +1,9 @@
-#### Program: Data Science by HarvardX
-#### Course 7: Linear Regression
+####Program: Data Science by HarvardX
+####Course 7: Linear Regression
 
 
-### Assessments on edX
-### Section 1: Baseball as a Motivating Example
+###Assessments on edX
+###Section 1: Baseball as a Motivating Example
 
 ##Q1:What is the application of statistics and data science to baseball called?
 (a)Moneyball;(b)Sabermetrics;(c)The “Oakland A’s Approach”;
@@ -113,28 +113,91 @@ Teams %>% filter(yearID %in% 1961:2001) %>%
 
 
 
-### Assessments on edX
-### Section 1: Introdution to Regression
+###Assessments on edX
+###Section 1: Introdution to Regression
   
-##Q1:A
+##Q1:While studying heredity, Francis Galton developed what important statistical concept?
+(a)Standard deviation;(b)Normal distribution;(c)Correlation;(d)Probability
+Answer:(c)
+Explanation:Francis Galton developed the concept of correlation while study heredity.
+
+##Q2:The correlation coefficient is a summary of what?
+(a)The trend between two variables
+(b)The dispersion of a variable
+(c)The central tendency of a variable
+(d)The distribution of a variable
+Answer:(a)
+Explanation:The correlation coefficient is a summary of the trend between two variables.
+The standard deviation describes the dispersion of a variable;
+the mean is a description of a variable’s central tendency;
+the distribution of a variable (e.g., normal, log-normal) describes the possible values of your
+data and the probability of them occurring.
+  
+##Q3:Below is a scatter plot showing the relationship between two variables, x and y.
+From this figure, the correlation between x and y appears to be about:
+(a)-0.9;(b)-0.2;(c)0.9;(d)2
+Answer:(a)
+Explanation:The correlation appears to be about -0.9.
+The variables x and y have a strong negative relationship with each other;
+as x increases, y decreases.
+  
+##Q4:Instead of running a Monte Carlo simulation with a sample size of 25 from the 179
+father-son pairs described in the videos,
+we now run our simulation with a sample size of 50.
+Would you expect the mean of our sample correlation to increase, decrease, or stay approximately the same?
+(a)Increase;(b)Decrease;(c)Stay approximately the same
+Answer:(c)
+Explanation:Because the expected value of the sample correlation is the population correlation,
+it should stay approximately the same even if the sample size is increased.
+
+##Q5:Instead of running a Monte Carlo simulation with a sample size of 25 from the 179
+father-son pairs described in the videos,
+we now run our simulation with a sample size of 50.
+Would you expect the standard deviation of our sample correlation to
+increase, decrease, or stay approximately the same?
+(a)Increase;(b)Decrease;(c)Stay approximately the same
+Answer:(b)
+Explanation:As the sample size N increases, the standard deviation of the sample correlation should decrease.
+  
+##Q6:If X and Y are completely independent, what do you expect the value of the correlation coefficient to be?
+(a)-1;(b)-0.5;(c)0;(d)0.5;(e)1
+(f)Not enough information to answer the question
+Answer:(c)
+Explanation:Variables that are independent of each other have a correlation coefficient of 0.
+  
+##Q7:Load the Lahman library. Filter the Teams data frame to include years from 1961 to 2001.
+What is the correlation coefficient between number of runs per game and number of at bats per game?
+Answer:0.6580976
+Code:The correlation coefficient can be calculated using the following code:
+library(Lahman)
+Teams_small <- Teams %>% filter(yearID %in% 1961:2001)
+cor(Teams_small$R/Teams_small$G, Teams_small$AB/Teams_small$G)
+  
+##Q8:Use the filtered Teams data frame from Question 7.
+What is the correlation coefficient between win rate (number of wins per game) and number of errors per game?
+Answer:-0.3396947
+Code:The correlation coefficient can be calculated using the following code:
+cor(Teams_small$W/Teams_small$G, Teams_small$E/Teams_small$G)
+  
+##Q9:Use the filtered Teams data frame from Question 7.
+What is the correlation coefficient between doubles (X2B) per game and triples (X3B) per game?
+Answer:-0.01157404
+Code:The correlation coefficient can be calculated using the following code:
+cor(Teams_small$X2B/Teams_small$G, Teams_small$X3B/Teams_small$G)
+
+
+
+
+####Assessments on edX
+####Section 1: Stratification and Variance Explained
+
+##Q1:
 (a)
 Answer:
 Explanation:
 Code:
 
-##Q2:A
-(a)
-Answer:
-Explanation:
-Code:
-  
-##Q3:A
-(a)
-Answer:
-Explanation:
-Code:
-  
-##Q4:A
+##Q2:
 (a)
 Answer:
 Explanation:
