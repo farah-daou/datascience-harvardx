@@ -157,9 +157,11 @@ Would you expect the standard deviation of our sample correlation to
 increase, decrease, or stay approximately the same?
 (a)Increase;(b)Decrease;(c)Stay approximately the same
 Answer:(b)
-Explanation:As the sample size N increases, the standard deviation of the sample correlation should decrease.
+Explanation:As the sample size N increases,
+the standard deviation of the sample correlation should decrease.
   
-##Q6:If X and Y are completely independent, what do you expect the value of the correlation coefficient to be?
+##Q6:If X and Y are completely independent,
+what do you expect the value of the correlation coefficient to be?
 (a)-1;(b)-0.5;(c)0;(d)0.5;(e)1
 (f)Not enough information to answer the question
 Answer:(c)
@@ -174,7 +176,8 @@ Teams_small <- Teams %>% filter(yearID %in% 1961:2001)
 cor(Teams_small$R/Teams_small$G, Teams_small$AB/Teams_small$G)
   
 ##Q8:Use the filtered Teams data frame from Question 7.
-What is the correlation coefficient between win rate (number of wins per game) and number of errors per game?
+What is the correlation coefficient between win rate (number of wins per game)
+and number of errors per game?
 Answer:-0.3396947
 Code:The correlation coefficient can be calculated using the following code:
 cor(Teams_small$W/Teams_small$G, Teams_small$E/Teams_small$G)
@@ -191,14 +194,174 @@ cor(Teams_small$X2B/Teams_small$G, Teams_small$X3B/Teams_small$G)
 ####Assessments on edX
 ####Section 1: Stratification and Variance Explained
 
-##Q1:
-(a)
-Answer:
-Explanation:
-Code:
+##Q1:Look at the figure below.
+The slope of the regression line in this figure is equal to what, in words?
+(a)Slope = (correlation coefficient of son and father heights) *
+  (standard deviation of sons’ heights / standard deviation of fathers’ heights)
+(b)Slope = (correlation coefficient of son and father heights) *
+  (standard deviation of fathers’ heights / standard deviation of sons’ heights)
+(c)Slope = (correlation coefficient of son and father heights) /
+  (standard deviation of sons’ heights * standard deviation of fathers’ heights)
+(d)Slope = (mean height of fathers) - (correlation coefficient of son and father heights
+  * mean height of sons).
+Answer:(a)
+Explanation:From the notes, we know that the slope is  m=ρσyσx .
+Expressed in words, the slope is the correlation coefficient of the son and father heights
+times the standard deviation of the sons' heights divided by the standard deviation of the fathers' heights.
 
-##Q2:
+
+##Q2:Why does the regression line simplify to a line with intercept zero and slope ρ
+when we standardize our x and y variables?
+Try the simplification on your own first!
+(a)When we standardize variables, both x and y will have a mean of one and a standard deviation of zero.
+When you substitute this into the formula for the regression line,
+the terms cancel out until we have the following equation:  yi=ρxi .
+(b)When we standardize variables, both x and y will have a mean of zero and a standard deviation of one.
+When you substitute this into the formula for the regression line,
+the terms cancel out until we have the following equation:  yi=ρxi .
+(c)When we standardize variables, both x and y will have a mean of zero and a standard deviation of one.
+When you substitute this into the formula for the regression line,
+the terms cancel out until we have the following equation:  yi=ρ+xi .
+Answer:(b)
+Explanation:When we standardize variables, they have a mean of 0 and a standard deviation of 1,
+giving the equation  yi=ρxi .
+The equation  yi=ρ+xi  is for a line with an intercept equal to the correlation coefficient,
+but the regression line simplifies
+to have an intercept of 0 when we standardize variables.
+  
+##Q3:What is a limitation of calculating conditional means?
+Select ALL that apply.
+(a)Each stratum we condition on (e.g., a specific father’s height) may not have many data points.
+(b)Because there are limited data points for each stratum, our average values have large standard errors.
+(c)Conditional means are less stable than a regression line.
+(d)Conditional means are a useful theoretical tool but cannot be calculated.
+Answer:(a),(b),and(c)
+Explanation:Some limitations of calculating conditional means include:
+each specific stratum used for conditioning may not have data points,
+because there are limited data points for each stratum there may be large standard errors on the means,
+and conditional means are less stable
+than a regression line. Conditional means can be calculated,
+so it is not correct that they are only useful as a theoretical tool.
+  
+##Q4:A regression line is the best prediction of Y given we know the value of X when:
+(a)X and Y follow a bivariate normal distribution.
+(b)Both X and Y are normally distributed.
+(c)Both X and Y have been standardized.
+(d)There are at least 25 X-Y pairs.
+Answer:(a)
+Explanation:In order for the regression line to be the best predictor of Y given a known value of X,
+X and Y must follow a bivariate normal distribution.
+It is insufficient for X and Y to each be normally distributed on their own;
+they must also have a joint bivariate normal distribution.
+  
+##Q5:Which one of the following scatterplots depicts an x and y distribution that is
+NOT well-approximated by the bivariate normal distribution?
+Answer:(a)
+Explanation:The v-shaped distribution of points from the first plot means that the x and y variables
+do not follow a bivariate normal distribution.
+When a pair of random variables is approximated by a bivariate normal, the scatter plot looks like an oval
+(as in the 2nd, 3rd, and 4th plots)
+It is okay if the oval is very round (as in the 3rd plot) or long and thin (as in the 4th plot).
+  
+##Q6:We previously calculated that the correlation coefficient  ρ  between fathers’ and sons’ heights is 0.5.
+Given this, what percent of the variation in sons’ heights is explained by fathers’ heights?
+(a)0%;(b)25%;(c)50%;(d)75%
+Answer:(b)
+Explanation:When two variables follow a bivariate normal distribution,
+the variation explained can be calculated as  ρ2×100 .
+In this case, with a correlation coefficient of 0.5,
+then the the variance explained is  0.52×100=25% .
+
+##Q7:Suppose the correlation between father and son’s height is 0.5,
+the standard deviation of fathers’ heights is 2 inches,
+and the standard deviation of sons’ heights is 3 inches.
+Given a one inch increase in a father’s height,
+what is the predicted change in the son’s height?
+(a)0.333;(b)0.5;(c)0.667;(d)0.75;(e)1;(f)1.5
+Answer:(d)
+Explanation:The slope of the regression line is calculated by multiplying the correlation coefficient
+by the ratio of the standard deviation of son heights and standard deviation of father heights: 
+  σson/σfather . In this case, that is  0.5×3/2 .
+
+
+In the second part of this assessment, you'll analyze a set of mother and daughter heights,
+also from GaltonFamilies. Define female_heights, a set of mother and daughter heights
+sampled from GaltonFamilies, as follows:
+
+set.seed(1989) #if you are using R 3.5 or earlier
+set.seed(1989, sample.kind="Rounding") #if you are using R 3.6 or later
+library(HistData)
+data("GaltonFamilies")
+
+female_heights <- GaltonFamilies%>%     
+  filter(gender == "female") %>%     
+  group_by(family) %>%     
+  sample_n(1) %>%     
+  ungroup() %>%     
+  select(mother, childHeight) %>%     
+  rename(daughter = childHeight)
+
+
+##Q8:Calculate the mean and standard deviation of mothers' heights, the mean and standard deviation
+of daughters' heights, and the correlaton coefficient between mother and daughter heights.
+(a)Mean of mothers' heights=64.1
+Code:mean(female_heights$mother)
+(b)Standard deviation of mothers' heights=2.29
+Code:sd(female_heights$mother)
+(c)Mean of daughters' heights=64.3
+Code:mean(female_heights$daughter)
+(d)Standard deviation of daughters' heights=2.39
+Code:sd(female_heights$daughter)
+(e)Correlation coefficient=0.325
+Code:cor(female_heights$mother, female_heights$daughter)
+  
+##Q9:Calculate the slope and intercept of the regression line
+predicting daughters' heights given mothers' heights.
+Given an increase in mother's height by 1 inch, how many inches is the daughter's height expected to change?
+(a)Slope of regression line predicting daughters' height from mothers' heights=0.339
+Code:r <- cor(female_heights$mother, female_heights$daughter)
+s_y <- sd(female_heights$daughter)
+s_x <- sd(female_heights$mother)
+r * s_y/s_x
+(b)Intercept of regression line predicting daughters' height from mothers' heights=42.5
+Code:mu_y <- mean(female_heights$daughter)
+mu_x <- mean(female_heights$mother)
+mu_y - (r * s_y/s_x)*mu_x
+(c)Change in daughter's height in inches given a 1 inch increase in the mother's height=0.339
+Code:r * s_y/s_x
+  
+##Q10:What percent of the variability in daughter heights is explained by the mother's height?
+Report your answer as a value between 0 and 100.
+Answer:10.5
+Code:r^2*100
+  
+##Q11:A mother has a height of 60 inches.
+What is the conditional expected value of her daughter's height given the mother's height?
+Answer:62.9
+Code:The expected height can be calculated using the following code:
+m = r * s_y/s_x
+b = mu_y - (r * s_y/s_x)*mu_x
+x = 60
+m*x+b
+
+
+
+
+####Assessments on edX
+####Setion 2:
+
+##Q1
 (a)
-Answer:
-Explanation:
-Code:
+Explanation
+
+##Q2
+(a)
+Explanation
+
+##Q3
+(a)
+Explanation
+
+##Q4
+(a)
+Explanation
