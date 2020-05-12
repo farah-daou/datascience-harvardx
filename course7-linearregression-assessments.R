@@ -239,9 +239,8 @@ Answer:(a),(b),and(c)
 Explanation:Some limitations of calculating conditional means include:
 each specific stratum used for conditioning may not have data points,
 because there are limited data points for each stratum there may be large standard errors on the means,
-and conditional means are less stable
-than a regression line. Conditional means can be calculated,
-so it is not correct that they are only useful as a theoretical tool.
+and conditional means are less stable than a regression line.
+Conditional means can be calculated, so it is not correct that they are only useful as a theoretical tool.
   
 ##Q4:A regression line is the best prediction of Y given we know the value of X when:
 (a)X and Y follow a bivariate normal distribution.
@@ -281,7 +280,7 @@ what is the predicted change in the son’s height?
 Answer:(d)
 Explanation:The slope of the regression line is calculated by multiplying the correlation coefficient
 by the ratio of the standard deviation of son heights and standard deviation of father heights: 
-  σson/σfather . In this case, that is  0.5×3/2 .
+σson/σfather. In this case, that is  0.5×3/2.
 
 
 In the second part of this assessment, you'll analyze a set of mother and daughter heights,
