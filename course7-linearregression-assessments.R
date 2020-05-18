@@ -114,7 +114,7 @@ Teams %>% filter(yearID %in% 1961:2001) %>%
 
 
 ###Assessments on edX
-###Section 1: Introdution to Regression
+###Section 1: Correlation
   
 ##Q1:While studying heredity, Francis Galton developed what important statistical concept?
 (a)Standard deviation;(b)Normal distribution;(c)Correlation;(d)Probability
@@ -347,7 +347,7 @@ m*x+b
 
 
 ####Assessments on edX
-####Section 2:Introduction to Linear Models
+####Section 2: Introduction to Linear Models
 
 ##Q1:As described in the videos, when we stratified our regression lines for
 runs per game vs. bases on balls by the number of home runs, what happened?
@@ -426,4 +426,821 @@ Answer:(a),(b),and(c)
 
 
 ####Assessments of edX
-####Section 2:
+####Section 2: Least Squares Estimates
+
+##Q1:The following code was used in the video to plot RSS with β0=25 .
+beta1 = seq(0, 1, len=nrow(galton_heights))
+results <- data.frame(beta1 = beta1,
+                      rss = sapply(beta1, rss, beta0 = 25))
+results %>% ggplot(aes(beta1, rss)) + geom_line() + 
+  geom_line(aes(beta1, rss), col=2)
+In a model for sons’ heights vs fathers’ heights,
+what is the least squares estimate (LSE) for  β1  if we assume  β^0  is 36?
+Hint: modify the code above to do your analysis.
+(a)0.65; (b)0.5; (c)0.2; (d)12
+Answer:(b)
+Explanation:Using the code from the video, you can plot RSS vs β1 to find the value for β1
+that minimizes the RSS. In this case, that value is 0.5 when we assume that  β^0  is 36.
+When we assumed that β^0 was 25, as in the sample code, the LSE for β1 was 0.65.
+
+##Q2:The least squares estimates for the parameters β0,β1,…,βn ________ the residual sum of squares.
+(a)maximize; (b)minimize; (c)equal
+Answer:(b)
+Explanation:The least squares estimates minimize, not maximize, the residual sum of squares.
+  
+##Q3:Load the Lahman library and filter the Teams data frame to the years 1961-2001.
+Run a linear model in R predicting the number of runs per game based on both the number of
+bases on balls per game and the number of home runs per game.
+What is the coefficient for bases on balls?
+(a)0.39; (b)1.56; (c)1.74; (d)0.027
+Answer:(a)
+Explanation:The coefficient for bases on balls is 0.39; the coefficient for home runs is 1.56;
+the intercept is 1.74; the standard error for the BB coefficient is 0.027.
+
+##Q4:We run a Monte Carlo simulation where we repeatedly take samples of N = 100 from the
+Galton heights data and compute the regression slope coefficients for each sample:
+  B <- 1000
+N <- 100
+lse <- replicate(B, {
+  sample_n(galton_heights, N, replace = TRUE) %>% 
+    lm(son ~ father, data = .) %>% .$coef 
+})
+
+lse <- data.frame(beta_0 = lse[1,], beta_1 = lse[2,]) 
+What does the central limit theorem tell us about the variables beta_0 and beta_1?
+Select ALL that apply.
+(a)They are approximately normally distributed.
+(b)The expected value of each is the true value of  β0  and  β1
+(assuming the Galton heights data is a complete population).
+(c)The central limit theorem does not apply in this situation.
+(d)It allows us to test the hypothesis that  β0=0  and  β1=0 .
+Answer:(a) and (b)
+Explanation:With a large enough N, the central limit theorem applies and tells us that the
+distributions of both beta_0 and beta_1 are approximately normal.
+The expected values of beta_0 and beta_1 are the true values of β0 and β1,
+assuming that the Galton heights data are a complete population.
+For hypothesis testing, we assume that the errors in the model are normally distributed.
+  
+##Q5:In an earlier video, we ran the following linear model and looked at a summary of the results.
+mod <- lm(son ~ father, data = galton_heights)
+summary(mod)
+Call:
+  lm(formula = son ~ father, data = galton_heights)
+
+Residuals:
+  Min     1Q  Median     3Q    Max 
+-5.902  -1.405  0.092    1.342  8.092 
+
+Coefficients:
+  Estimate  Std. Error  t value     Pr(>|t|)  
+(Intercept)     35.7125     4.5174       7.91    2.8e-13 ***
+  father           0.5028     0.0653       7.70    9.5e-13 ***
+  ---
+  Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+What null hypothesis is the second p-value (the one in the father row) testing?
+(a)β1=1, where β1 is the coefficient for the variable "father."
+(b)β1=0.503, where β1 is the coefficient for the variable "father."
+(c)β1=0, where β1 is the coefficient for the variable "father."
+Answer:(c)
+Explanation:The p-value for "father" tests the null hypothesis that  β1=0 , i.e., the fathers' heights
+are not associated with the sons' heights, where  β1  is the coefficient for the variable father.
+  
+##Q6:Which R code(s) below would properly plot the predictions and
+confidence intervals for our linear model of sons’ heights?
+Select ALL that apply.
+(a)galton_heights %>% ggplot(aes(father, son)) +
+  geom_point() +
+  geom_smooth()
+(b)galton_heights %>% ggplot(aes(father, son)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+(c)model <- lm(son ~ father, data = galton_heights)
+predictions <- predict(model, interval = c("confidence"), level = 0.95)
+data <- as_tibble(predictions) %>% bind_cols(father = galton_heights$father)
+ggplot(data, aes(x = father, y = fit)) +
+  geom_line(color = "blue", size = 1) + 
+  geom_ribbon(aes(ymin=lwr, ymax=upr), alpha=0.2) + 
+  geom_point(data = galton_heights, aes(x = father, y = son))
+(d)model <- lm(son ~ father, data = galton_heights)
+predictions <- predict(model)
+data <- as_tibble(predictions) %>% bind_cols(father = galton_heights$father)
+
+ggplot(data, aes(x = father, y = fit)) +
+  geom_line(color = "blue", size = 1) + 
+  geom_point(data = galton_heights, aes(x = father, y = son))
+Answer:(b) and (c)
+Explanation:If using the geom_smooth command, you need to specify that method = “lm” in
+your geom_smooth command, otherwise the smooth line is a loess smooth and not a linear model.
+If using the predict command, you need to include the confidence intervals on your figure by
+first specifying that you want confidence intervals in the predict command,
+and then adding them to your figure as a geom_ribbon.
+  
+
+Define female_heights, a set of mother and daughter heights sampled from GaltonFamilies, as follows:
+  
+set.seed(1989) #if you are using R 3.5 or earlier
+set.seed(1989, sample.kind="Rounding") #if you are using R 3.6 or later
+library(HistData)
+data("GaltonFamilies")
+options(digits = 3)    # report 3 significant digits
+
+female_heights <- GaltonFamilies %>%     
+  filter(gender == "female") %>%     
+  group_by(family) %>%     
+  sample_n(1) %>%     
+  ungroup() %>%     
+  select(mother, childHeight) %>%     
+  rename(daughter = childHeight)
+
+##Q7:Fit a linear regression model predicting the mothers' heights using daughters' heights.
+(a)What is the slope of the model?
+Answer=0.31
+Code:fit <- lm(mother ~ daughter, data = female_heights)
+fit$coef[2]
+
+(b)What the intercept of the model?
+Answer=44.12
+Code:fit$coef[1]
+  
+##Q8:Predict mothers' heights using the model.
+(a)What is the predicted height of the first mother in the dataset?
+Answer=65.6
+Code:predict(fit)[1]
+
+(b)What is the actual height of the first mother in the dataset?
+Answer=67
+Code:female_heights$mother[1]
+  
+
+We have shown how BB and singles have similar predictive power for scoring runs.
+Another way to compare the usefulness of these baseball metrics is by assessing
+how stable they are across the years. Because we have to pick players based on their
+previous performances, we will prefer metrics that are more stable.
+In these exercises, we will compare the stability of singles and BBs.
+
+Before we get started, we want to generate two tables:
+one for 2002 and another for the average of 1999-2001 seasons.
+We want to define per plate appearance statistics,
+keeping only players with more than 100 plate appearances.
+Here is how we create the 2002 table:
+
+library(Lahman)
+bat_02 <- Batting %>% filter(yearID == 2002) %>%
+    mutate(pa = AB + BB, singles = (H - X2B - X3B - HR)/pa, bb = BB/pa) %>%
+    filter(pa >= 100) %>%
+    select(playerID, singles, bb)
+
+##Q9:Now compute a similar table but with rates computed over 1999-2001.
+Keep only rows from 1999-2001 where players have 100 or more plate appearances,
+calculate each player's single rate and BB rate per season,
+then calculate the average single rate (mean_singles) and
+average BB rate (mean_bb) per player over those three seasons.
+(a)How many players had a single rate mean_singles of greater than 0.2 per plate appearance over 1999-2001?
+Answer=46
+Code:bat_99_01 <- Batting %>% filter(yearID %in% 1999:2001) %>%
+  mutate(pa = AB + BB, singles = (H - X2B - X3B - HR)/pa, bb = BB/pa) %>%
+  filter(pa >= 100) %>%
+  group_by(playerID) %>%
+  summarize(mean_singles = mean(singles), mean_bb = mean(bb))
+sum(bat_99_01$mean_singles > 0.2)
+
+(b)How many players had a BB rate mean_bb of greater than 0.2 per plate appearance over 1999-2001?
+Answer=3
+Code:sum(bat_99_01$mean_bb > 0.2)
+  
+##Q10:Use inner_join() to combine the bat_02 table with the table of 1999-2001
+rate averages you created in the previous question.
+(a)What is the correlation between 2002 singles rates and 1999-2001 average singles rates?
+Answer=0.551
+Code:dat <- inner_join(bat_02, bat_99_01)
+cor(dat$singles, dat$mean_singles)
+
+(b)What is the correlation between 2002 BB rates and 1999-2001 average BB rates?
+Answer=0.717
+Code:cor(dat$bb, dat$mean_bb)
+  
+##Q11:Make scatterplots of mean_singles versus singles and mean_bb versus bb.
+Are either of these distributions bivariate normal?
+(a)Neither distribution is bivariate normal.
+(b)singles and mean_singles are bivariate normal, but bb and mean_bb are not.
+(c)bb and mean_bb are bivariate normal, but singles and mean_singles are not.
+(d)Both distributions are bivariate normal.
+Answer:(d)
+Code:Both distributions are bivariate normal, as can be seen in the scatter plots
+made using the following code:
+dat %>%
+  ggplot(aes(singles, mean_singles)) +
+  geom_point()
+dat %>%
+  ggplot(aes(bb, mean_bb)) +
+  geom_point()
+  
+##Q12:
+(a)Fit a linear model to predict 2002 singles given 1999-2001 mean_singles.
+What is the coefficient of mean_singles, the slope of the fit?
+Answer=0.5881
+Code:fit_singles <- lm(singles ~ mean_singles, data = dat)
+fit_singles$coef[2]
+
+(b)Fit a linear model to predict 2002 bb given 1999-2001 mean_bb.
+What is the coefficient of mean_bb, the slope of the fit?
+Answer=0.8290
+Code:fit_bb <- lm(bb ~ mean_bb, data = dat)
+fit_bb$coef[2]
+  
+  
+  
+  
+####Assessments on edX
+####Section 2: Tibbles, do, and broom
+
+
+##Q1:As seen in the videos, what problem do we encounter when we try to run a
+linear model on our baseball data, grouping by home runs?
+(a)There is not enough data in some levels to run the model.
+(b)The lm() function does not know how to handle grouped tibbles.
+(c)The results of the lm() function cannot be put into a tidy format.
+Answer:(b)
+Explanation:The lm() function does not know how to handle grouped tibbles, so we can't simply
+run a linear model on the baseball data grouped by home runs.
+We need something to bridge between the grouped tibble and the lm() function.
+  
+##Q2:Tibbles are similar to what other class in R?
+(a)Vectors; (b)Matrices; (c)Data frames; (d)Lists
+Answer:(c)
+Explanation:Tibbles are essentially modern versions of data frames.
+  
+##Q3:What are some advantages of tibbles compared to data frames?
+Select ALL that apply.
+(a)Tibbles display better.
+(b)If you subset a tibble, you always get back a tibble.
+(c)Tibbles can have complex entries.
+(d)Tibbles can be grouped.
+Answer:(a), (b), (c), and (d)
+Explanation:All of the listed answers are advantages of tibbles when compared to data frames:
+tibbles display better, they always return tibbles when subsetted,
+they can have complex entries, and they can be grouped.
+  
+##Q4:What are two advantages of the do() command, when applied to the tidyverse?
+Select TWO.
+(a)It is faster than normal functions.
+(b)It returns useful error messages.
+(c)It understands grouped tibbles.
+(d)It always returns a data.frame.
+Answer: (c) and (d)
+Explanation:The do function serves as a useful bridge between base R functions and the tidyverse.
+It understands grouped tibbles and always returns a data.frame.
+
+##Q5:You want to take the tibble dat, which we used in the video on the do() function,
+and run the linear model R ~ BB for each strata of HR.
+Then you want to add three new columns to your grouped tibble:
+the coefficient, standard error, and p-value for the BB term in the model.
+You’ve already written the function get_slope(), shown below.
+
+get_slope <- function(data) {
+  fit <- lm(R ~ BB, data = data)
+  sum.fit <- summary(fit)
+
+  data.frame(slope = sum.fit$coefficients[2, "Estimate"], 
+             se = sum.fit$coefficients[2, "Std. Error"],
+             pvalue = sum.fit$coefficients[2, "Pr(>|t|)"])
+}
+
+What additional code could you write to accomplish your goal?
+(a)dat %>% 
+  group_by(HR) %>% 
+  do(get_slope)
+(b)dat %>% 
+  group_by(HR) %>% 
+  do(get_slope(.))
+(c)dat %>% 
+  group_by(HR) %>% 
+  do(slope = get_slope(.))
+(d)dat %>% 
+  do(get_slope(.))
+Answer:(b)
+Code:dat %>% 
+  group_by(HR) %>% 
+  do(get_slope(.))
+
+This is the only command that correctly creates a tibble with four columns:
+HR, slope, se, and pvalue for each level of HR. The data frame must be passed to get_slope() using .
+If you name the results of the do() command such as in the code do(slope = get_slope(.)),
+that will save all results in a single column called slope.
+If you forget group_by(), then the results will be a model on the data as a whole,
+rather than on the data stratified by home runs.
+
+##Q6:The output of a broom function is always what?
+(a)A data.frame; (b)A list; (c)A vector
+Answer:(a)
+Explanation:The broom functions always output data.frame.
+  
+##Q7:You want to know whether the relationship between home runs and runs per game varies by baseball league. 
+You create the following dataset:
+
+dat <- Teams %>% filter(yearID %in% 1961:2001) %>%
+  mutate(HR = HR/G,
+         R = R/G) %>%
+  select(lgID, HR, BB, R) 
+What code would help you quickly answer this question?
+(a)dat %>% 
+  group_by(lgID) %>% 
+  do(tidy(lm(R ~ HR, data = .), conf.int = T)) %>% 
+  filter(term == "HR") 
+(b)dat %>% 
+  group_by(lgID) %>% 
+  do(glance(lm(R ~ HR, data = .)))
+(c)dat %>% 
+  do(tidy(lm(R ~ HR, data = .), conf.int = T)) %>% 
+  filter(term == "HR")
+(d)dat %>% 
+  group_by(lgID) %>% 
+  do(mod = lm(R ~ HR, data = .))
+Answer:(a)
+Code:
+dat %>% 
+  group_by(lgID) %>% 
+  do(tidy(lm(R ~ HR, data = .), conf.int = T)) %>% 
+  filter(term == "HR")
+This code is a good application of the command tidy(), from the broom package.
+The glance() function provides data on model fit rather than on effect estimates and confidence intervals.
+If you forget the line group_by(lgID), your code will give you a single estimate for the entire dataset
+because you have not grouped the data by league ID.
+
+dat %>% 
+  group_by(lgID) %>% 
+  do(mod = lm(R ~ HR, data = .))
+This code gives get a data.frame with the column mod, which contains the linear model results.
+While it is possible to then extract effect estimates and confidence intervals from this model,
+it is not nearly as easy as using the tidy function.
+
+
+
+
+We have investigated the relationship between fathers' heights and sons' heights.
+But what about other parent-child relationships? Does one parent's height have a
+stronger association with child height?
+How does the child's gender affect this relationship in heights?
+Are any differences that we observe statistically significant?
+
+The galton dataset is a sample of one male and one female child from each family in the GaltonFamilies dataset.
+The pair column denotes whether the pair is father and daughter, father and son,
+mother and daughter, or mother and son.
+
+Create the galton dataset using the code below:
+
+library(tidyverse)
+library(HistData)
+data("GaltonFamilies")
+set.seed(1) # if you are using R 3.5 or earlier
+set.seed(1, sample.kind = "Rounding") # if you are using R 3.6 or later
+galton <- GaltonFamilies %>%
+    group_by(family, gender) %>%
+    sample_n(1) %>%
+    ungroup() %>% 
+    gather(parent, parentHeight, father:mother) %>%
+    mutate(child = ifelse(gender == "female", "daughter", "son")) %>%
+    unite(pair, c("parent", "child"))
+
+galton
+  
+##Q8:Group by pair and summarize the number of observations in each group.
+(a)How many father-daughter pairs are in the dataset?
+Answer = 176
+(b)How many mother-son pairs are in the dataset?
+Answer = 179
+
+Code:galton %>%
+    group_by(pair) %>%
+    summarize(n = n())
+  
+##Q9:Calculate the correlation coefficients for fathers and daughters, fathers and sons,
+mothers and daughters and mothers and sons.
+
+Which pair has the strongest correlation in heights?
+(a)fathers and daughters; (b)fathers and sons
+(c)mothers and daughters; (d)mothers and sons
+Answer:(b)
+Code:galton %>%
+    group_by(pair) %>%
+    summarize(cor = cor(parentHeight, childHeight)) %>%
+    filter(cor == max(cor))
+
+Which pair has the weakest correlation in heights?
+(a)fathers and daughters; (b)fathers and sons
+(c)mothers and daughters; (d)mothers and sons
+Code:galton %>%
+    group_by(pair) %>%
+    summarize(cor = cor(parentHeight, childHeight)) %>%
+    filter(cor == min(cor))
+  
+##Q10:Use lm() and the broom package to fit regression lines for each parent-child pair type.
+Compute the least squares estimates, standard errors, confidence intervals and p-values
+for the parentHeight coefficient for each pair.
+
+(a)What is the estimate of the father-daughter coefficient?
+Answer = 0.34
+Code:library(broom)
+galton %>%
+    group_by(pair) %>%
+    do(tidy(lm(childHeight ~ parentHeight, data = .), conf.int = TRUE)) %>%
+    filter(term == "parentHeight", pair == "father_daughter") %>%
+    pull(estimate)
+
+(b)For every 1-inch increase in mother's height, how many inches does the typical son's height increase?
+Give your answer as a number with no units.
+Answer = 0.381
+Code:galton %>%
+    group_by(pair) %>%
+    do(tidy(lm(childHeight ~ parentHeight, data = .), conf.int = TRUE)) %>%
+    filter(term == "parentHeight", pair == "mother_son") %>%
+    pull(estimate)
+  
+##Q11:
+Which sets of parent-child heights are significantly correlated at a p-value cut off of .05?
+Select ALL that apply.
+(a)father-daughter; (b)father-son
+(c)mother-daughter; (d)mother-son
+Answer:(a), (b), (c), and (d)
+Explanation:All of the parent-child heights are correlated with a p-value of <0.05
+
+Which of the following statements are true?
+Select ALL that apply.
+(a)All of the confidence intervals overlap each other.
+(b)At least one confidence interval covers zero.
+(c)The confidence intervals involving mothers' heights are larger than the confidence intervals
+involving fathers' heights.
+(d)The confidence intervals involving daughters' heights are larger than the confidence intervals
+involving sons' heights.
+(e)The data are consistent with inheritance of height being independent of the child's gender.
+(f)The data are consistent with inheritance of height being independent of the parent's gender.
+Answer:(a), (c), (e), and (f) 
+Code:galton %>%
+    group_by(pair) %>%
+    do(tidy(lm(childHeight ~ parentHeight, data = .), conf.int = TRUE)) %>%
+    filter(term == "parentHeight" & p.value < .05)
+All four of the confidence intervals overlap. The confidence intervals for mothers' heights
+are larger than those for fathers' heights, as observed from the standard errors.
+Because the confidence intervals overlap, the data are consistent with inheritance of height being
+independent of the child's or the parent's gender.
+
+  
+  
+####Assessments on edX
+####Section 2: Regression and Baseball
+  
+  
+##Q1:What is the final linear model (in the video "Building a Better Offensive Metric for Baseball")
+we used to predict runs scored per game?
+(a)lm(R ~ BB + HR)
+(b)lm(HR ~ BB + singles + doubles + triples)
+(c)lm(R ~ BB + singles + doubles + triples + HR)
+(d)lm(R ~ singles + doubles + triples + HR)
+Answer:(c)
+Explanation:lm(R ~ BB + singles + doubles + triples + HR) is the only one of the
+models above that predicts runs scored based on all of the following:
+  BBs, singles, doubles, triples, and HRs.
+  
+##Q2:We want to estimate runs per game scored by individual players, not just by teams.
+What summary metric do we calculate to help estimate this?
+Look at the code from the video "Building a Metter Offensive Metric for Baseball" for a hint:
+  
+pa_per_game <- Batting %>% 
+  filter(yearID == 2002) %>% 
+  group_by(teamID) %>%
+  summarize(pa_per_game = sum(AB+BB)/max(G)) %>% 
+  .$pa_per_game %>% 
+  mean
+The summary metric used is:
+(a)pa_per_game: the mean number of plate appearances per team per game for each team
+(b)pa_per_game: the mean number of plate appearances per game for each player
+(c)pa_per_game: the number of plate appearances per team per game, averaged across all teams
+Answer:(c)
+Explanation:pa_per_game is the number of plate appearances per team per game averaged across all teams.
+We initially calculated the pa_per_game grouped by teams
+but then took the means across all teams to get one summary metric.
+  
+##Q3:Imagine you have two teams. Team A is comprised of batters who, on average,
+get two bases on balls, four singles, one double, no triples, and one home run.
+Team B is comprised of batters who, on average,
+get one base on balls, six singles, two doubles, one triple, and no home runs.
+
+Which team scores more runs, as predicted by our model?
+(a)Team A; (b)Team B; (c)Tie; (d)Impossible to know
+Answer:(b)
+Explanation:By using the coefficients from the linear model to predict the number of runs scored
+by each team,you find that Team B is expected to score more runs on average.
+  
+##Q4:The on-base-percentage plus slugging percentage (OPS) metric gives the most weight to:
+(a)Singles; (b)Doubles; (c)Triples; (d)Home Runs
+Answer:(d)
+Explanation:By looking at the equation for OPS, you can tell that the
+OPS metric weights home runs most heavily.
+  
+##Q5:What statistical concept properly explains the “sophomore slump”?
+(a)Regression to the mean; (b)Law of averages; (c)Normal distribution
+Answer:(a)
+Explanation:Regression to the mean is what explains the sophomore slump.
+The correlation for performance in two separate years is high but not perfect,
+so high performers will tend to perform slightly worse in the following year
+(and low performers will tend to perform slightly better in the following year).
+  
+##Q6:In our model of time vs. observed_distance in the video
+"Measurement Error Models", the randomness of our data was due to:
+(a)sampling; (b)natural variability; (c)measurement error
+Answer:(c)
+Explanation:Measurement error models look at applications where randomness
+is introduced from measurement error instead of sampling or natural variability.
+  
+##Q7:Which of the following are important assumptions about the measurement errors
+in the experiment presented in the video "Measurement Error Models"?
+Select ALL that apply.
+(a)The measurement error is random
+(b)The measurement error is independent
+(c)The measurement error has the same distribution for each time  i
+Answer:(a), (b), and (c)
+Explanation:In this model, we asumed that the measurement errors were random,
+independent from each other, and had the same distribution for each time i.
+We also assumed that there was no bias, which means that  E[ε]=0 .
+  
+##Q8:Which of the following scenarios would violate an assumption of our measurement error model?
+(a)The experiment was conducted on the moon.
+(b)There was one position where it was particularly difficult to see the dropped ball.
+(c)The experiment was only repeated 10 times, not 100 times.
+Answer: (b)
+Explanation:If there were one position where it was particularly difficult to see the dropped ball,
+that would violate the assumption of randomness.
+If the experiment were conducted on the moon, that would simply predict a different gravitational constant.
+Repeating the experiment 10 instead of 100 times would not matter
+because we do not need a large sample for our assumptions to be valid in this model.
+  
+##Q9:Use the Teams data frame from the Lahman package.
+Fit a multivariate linear regression model to obtain the effects of BB and HR on Runs (R) in 1971.
+Use the tidy() function in the broom package to obtain the results in a data frame.
+(a)What is the estimate for the effect of BB on runs?
+Answer = 0.412
+Code:library(Lahman)
+library(broom)
+Teams %>%
+  filter(yearID == 1971) %>%
+  lm(R ~ BB + HR, data = .) %>%
+  tidy() %>%
+  filter(term == "BB") %>%
+  pull(estimate)
+  
+(b)What is the estimate for the effect of HR on runs?
+Answer = 1.29
+Code:The estimate can be calculated using the following code:
+Teams %>%
+  filter(yearID == 1971) %>%
+  lm(R ~ BB + HR, data = .) %>%
+  tidy() %>%
+  filter(term == "HR") %>%
+  pull(estimate)
+  
+(c)Interpret the p-values for the estimates using a cutoff of 0.05.
+Which of the following is the correct interpretation?
+(a)Both BB and HR have a nonzero effect on runs.
+(b)HR has a significant effect on runs, but the evidence is not strong enough to suggest BB also does.
+(c)BB has a significant effect on runs, but the evidence is not strong enough to suggest HR also does.
+(d)Neither BB nor HR have a statistically significant effect on runs.
+Answer:(b)
+Explanation: The p-value for HR is less than 0.05, but the p-value of BB is greater than 0.05 (0.06),
+so the evidence is not strong enough to suggest that BB
+has a significant effect on runs at a p-value cutoff of 0.05.
+
+##Q10:Repeat the above exercise to find the effects of BB and HR on runs (R)
+for every year from 1961 to 2018 using do() and the broom package.
+Make a scatterplot of the estimate for the effect of BB on runs over time
+and add a trend line with confidence intervals.
+
+Fill in the blank to complete the statement:
+The effect of BB on runs has ________ over time.
+(a)decreased
+(b)increased
+(c)remained the same
+Answer:(b)
+Explanation:The scatterplot with trendline can be made using the following code:
+res <- Teams %>%
+  filter(yearID %in% 1961:2018) %>%
+  group_by(yearID) %>%
+  do(tidy(lm(R ~ BB + HR, data = .))) %>%
+  ungroup() 
+res %>%
+  filter(term == "BB") %>%
+  ggplot(aes(yearID, estimate)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+  
+##Q11:Fit a linear model on the results from Question 10 to determine the effect of year on the impact of BB.
+(a)For each additional year, by what value does the impact of BB on runs change?
+Answer = 0.00355
+Code:The value can be calculated using the following code:
+res %>%
+  filter(term == "BB") %>%
+  lm(estimate ~ yearID, data = .) %>%
+  tidy() %>%
+  filter(term == "yearID") %>%
+  pull(estimate)
+  
+(b)What is the p-value for this effect?
+Answer = 0.00807
+Code:The p-value can be calculated using the following code:
+res %>%
+  filter(term == "BB") %>%
+  lm(estimate ~ yearID, data = .) %>%
+  tidy() %>%
+  filter(term == "yearID") %>%
+  pull(p.value)
+  
+  
+  
+  
+####Assessments on edX
+####Section 2: Linear Models (Verified Learners only)
+
+
+Game attendance in baseball varies partly as a function of how well a team is playing.
+
+Load the Lahman library. The Teams data frame contains an attendance column.
+This is the total attendance for the season.
+To calculate average attendance, divide by the number of games played, as follows:
+  
+library(tidyverse)
+library(broom)
+library(Lahman)
+Teams_small <- Teams %>% 
+  filter(yearID %in% 1961:2001) %>% 
+  mutate(avg_attendance = attendance/G)
+Use linear models to answer the following 3-part question about Teams_small.
+
+
+##Q1:Use runs (R) per game to predict average attendance.
+(a)For every 1 run scored per game, average attendance increases by how much?
+Answer = 4117
+Code:The increase in average attendance can be found using the following code:
+# find regression line predicting attendance from R and take slope
+Teams_small %>% 
+  mutate(R_per_game = R/G) %>% 
+  lm(avg_attendance ~ R_per_game, data = .) %>% 
+  .$coef %>%
+  .[2]
+  
+(b)Use home runs (HR) per game to predict average attendance.
+For every 1 home run hit per game, average attendance increases by how much?
+Answer = 8113
+Code:The increase in average attendance can be found using the following code:
+Teams_small %>% 
+  mutate(HR_per_game = HR/G) %>% 
+  lm(avg_attendance ~ HR_per_game, data = .) %>% 
+  .$coef %>%
+  .[2]
+  
+(c)Use number of wins to predict average attendance; do not normalize for number of games.
+For every game won in a season, how much does average attendance increase?
+Answer = 121
+Code:The increase in average attendance can be found using the following code:
+Teams_small %>% 
+  lm(avg_attendance ~ W, data = .) %>%
+  .$coef %>%
+  .[2]
+  
+(d)Suppose a team won zero games in a season.
+Predict the average attendance
+Answer = 1129
+Code:The average attendance can be found using the following code:
+Teams_small %>% 
+  lm(avg_attendance ~ W, data = .) %>% 
+  .$coef %>%
+  .[1]
+
+(e)Use year to predict average attendance.
+How much does average attendance increase each year?
+Answer = 244
+Code:The increase in attendance can be found using the following code:
+Teams_small %>% 
+  lm(avg_attendance ~ yearID, data = .) %>% 
+  .$coef %>%
+  .[2]
+  
+##Q2:Game wins, runs per game and home runs per game are positively correlated with attendance.
+We saw in the course material that runs per game and home runs per game are correlated with each other.
+Are wins and runs per game or wins and home runs per game correlated?
+(a)What is the correlation coefficient for wins and runs per game?
+Answer = 0.4116491
+Code:The following code will give the correlation coefficient:
+cor(Teams_small$W, Teams_small$R/Teams_small$G)
+  
+(b)What is the correlation coefficient for wins and home runs per game?
+Answer = 0.2744313
+Code:The following code will give the correlation coefficient:
+cor(Teams_small$W, Teams_small$HR/Teams_small$G)
+  
+##Q3:Stratify Teams_small by wins: divide number of wins by 10 and then round to the nearest integer.
+Keep only strata 5 through 10, which have 20 or more data points.
+Use the stratified dataset to answer this three-part question.
+
+(a)How many observations are in the 8 win strata?
+(Note that due to division and rounding, these teams have 75-85 wins.)
+Answer = 338
+Code:The number of observations can be found using the following code:
+dat <- Teams_small %>%
+  mutate(W_strata = round(W/10)) %>%
+  filter(W_strata >= 5 & W_strata <= 10)
+
+sum(dat$W_strata == 8)
+
+(b)Calculate the slope of the regression line predicting average attendance
+given runs per game for each of the win strata.
+Which win stratum has the largest regression line slope?
+(a)5; (b)6; (c)7; (d)8; (e)9; (f)10
+Answer:(a)
+Code:The slope can be found using the following code:
+# calculate slope of regression line after stratifying by R per game
+dat %>%  
+  group_by(W_strata) %>%
+  summarize(slope = cor(R/G, avg_attendance)*sd(avg_attendance)/sd(R/G))
+  
+(c)Calculate the slope of the regression line predicting average attendance
+given HR per game for each of the win strata.
+Which win stratum has the largest regression line slope?
+(a)5; (b)6; (c)7; (d)8; (e)9; (f)10
+Answer:(a)
+Code:The slope can be found using the following code:
+# calculate slope of regression line after stratifying by HR per game
+dat %>%  
+  group_by(W_strata) %>%
+  summarize(slope = cor(HR/G, avg_attendance)*sd(avg_attendance)/sd(HR/G))
+  
+(d)Which of the followng are true about the effect of win strata on average attendance?
+Select ALL that apply.
+(a)Across all win strata, runs per game are positively correlated with average attendance.
+(b)Runs per game have the strongest effect on attendance when a team wins many games.
+(c)After controlling for number of wins, home runs per game are not correlated with attendance.
+(d)Home runs per game have the strongest effect on attendance when a team does not win many games.
+(e)Among teams with similar numbers of wins, teams with more home runs per game have larger average attendance.
+Answer:(a), (d), and (e) 
+Explanation:Looking at the data, we can see that runs per game are positively correlated with average attendance,
+that home runs per game have the strongest effect on attendance when teams don't win many games, and that teams with
+fewer wins have a larger average attendance with more home runs per game.
+We also see that runs per game have a stronger effect when teams win few, not many, games, and that home runs per game
+are in fact positively correlated with attendance in all win strata.
+
+
+##Q4:Fit a multivariate regression determining the effects of runs per game, home runs per game, wins, and year on average attendance.
+Use the original Teams_small wins column, not the win strata from question 3.
+(a)What is the estimate of the effect of runs per game on average attendance?
+Answer = 322
+Code:The estimate can be found using the following code:
+fit <- Teams_small %>% 
+    mutate(R_per_game = R/G,
+           HR_per_game = HR/G) %>%
+    lm(avg_attendance ~ R_per_game + HR_per_game + W + yearID, data = .)
+tidy(fit) %>%
+    filter(term == "R_per_game") %>%
+    pull(estimate)
+
+(b)What is the estimate of the effect of home runs per game on average attendance?
+Answer = 1798
+Code:The estimate can be found using the following code:
+tidy(fit) %>%
+    filter(term == "HR_per_game") %>%
+    pull(estimate)
+
+(c)What is the estimate of the effect of number of wins in a season on average attendance?
+Answer = 117
+Code:The estimate can be found using the following code:
+tidy(fit) %>%
+    filter(term == "W") %>%
+    pull(estimate)
+  
+##Q5:Use the multivariate regression model from Question 4.
+Suppose a team averaged 5 runs per game, 1.2 home runs per game, and won 80 games in a season.
+(a)What would this team's average attendance be in 2002?
+Answer = 16149.39
+Code:The average attendance can be found using the following code:
+predict(fit, data.frame(R_per_game = 5, HR_per_game = 1.2, W = 80, yearID = 2002))
+
+(b)What would this team's average attendance be in 1960?
+Answer = 6504.842
+Code:The average attendance can be found using the following code:
+predict(fit, data.frame(R_per_game = 5, HR_per_game = 1.2, W = 80, yearID = 1960))
+  
+##Q6:Use your model from Question 4 to predict average attendance for teams in 2002 in the original Teams data frame.
+What is the correlation between the predicted attendance and actual attendance?
+Answer = 0.519
+Code:The correlation can be found using the following code:
+newdata <- Teams %>%
+    filter(yearID == 2002) %>%
+    mutate(avg_attendance = attendance/G,
+           R_per_game = R/G,
+           HR_per_game = HR/G)
+preds <- predict(fit, newdata)
+cor(preds, newdata$avg_attendance)
+  
+
+  
+
+####Assessments on edX
+####Section 3:
+
