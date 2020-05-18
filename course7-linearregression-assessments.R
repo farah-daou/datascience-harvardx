@@ -1187,7 +1187,8 @@ We also see that runs per game have a stronger effect when teams win few, not ma
 are in fact positively correlated with attendance in all win strata.
 
 
-##Q4:Fit a multivariate regression determining the effects of runs per game, home runs per game, wins, and year on average attendance.
+##Q4:Fit a multivariate regression determining the effects of runs per game,
+home runs per game, wins, and year on average attendance.
 Use the original Teams_small wins column, not the win strata from question 3.
 (a)What is the estimate of the effect of runs per game on average attendance?
 Answer = 322
