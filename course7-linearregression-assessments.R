@@ -1445,3 +1445,4 @@ dat %>%
   ggplot(aes(discipline, success, size = applications, color = gender)) + 
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   geom_point()
+
