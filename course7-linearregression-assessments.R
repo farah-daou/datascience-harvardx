@@ -1361,7 +1361,6 @@ Answer = 1345
 (b)What is the number of women not awarded?
 Answer = 1011
 Code:The two-by-two table can be constructed using the following code:
-
 two_by_two <- research_funding_rates %>% 
   select(-discipline) %>% 
   summarize_all(funs(sum)) %>%
