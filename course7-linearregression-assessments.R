@@ -1243,5 +1243,206 @@ cor(preds, newdata$avg_attendance)
   
 
 ####Assessments on edX
-####Section 3:
+####Section 3: Correlation is Not Causation
 
+
+##Q1:In the videos, we ran one million tests of correlation for two random variables, X and Y.
+How many of these correlations would you expect to have a significant p-value ( p≤0.05 ), just by chance?
+(a)5,000; (b)50,000; (c)100,000; (d)It’s impossible to know
+Answer:(b)
+Explanation:The p-value is defined as the probability of finding the observed result when the
+null hypothesis (no correlation) is true.
+When we have a p-value of 0.05, this means the chance of finding a correlation when none exists is 5%
+e.g., 0.05*1,000,000 chances, which is 50,000.
+
+##Q2:Which of the following are examples of p-hacking?
+Select ALL that apply.
+(a)Looking for associations between an outcome and several exposures
+and only reporting the one that is significant.
+(b)Trying several different models and selecting the one that yields the smallest p-value.
+(c)Repeating an experiment multiple times and only reporting the one with the smallest p-value.
+(d)Using a Monte Carlo simulations in an analysis.
+Answer:(a), (b), and (c)
+Explanation:Repeating an experiment multiple times and only reporting the one with the smallest p-value,
+looking for associations between an outcome and several exposures and only reporting the one that is significant,
+and trying several different models and selecting the one that yields the smallest p-value
+are all examples of p-hacking.
+Monte Carlo simulations do not necessarily lead to multiple testing problems
+such as p-hacking in and of themselves.
+
+##Q3:The Spearman correlation coefficient is robust to outliers because:
+(a)It drops outliers before calculating correlation.
+(b)It is the correlation of standardized values.
+(c)It calculates correlation between ranks, not values.
+Answer:(c)
+Explanation:Because the Spearman correlation coefficient uses ranks instead of values
+to calculate correlation, it is more robust to outliers.
+
+##Q4:What can you do to determine if you are misinterpreting results because of a confounder?
+(a)Nothing. If the p-value says the result is significant, then it is.
+(b)More closely examine the results by stratifying and plotting the data.
+(c)Always assume that you are misinterpreting the results.
+(d)Use linear models to tease out a confounder.
+Answer:(b)
+Explanation:Exploratory data analysis (stratifying and plotting data)
+can help determine if there is a confounder.
+Linear models cannot be used in all situations.
+
+##Q5:Look again at the admissions data presented in the confounders video using ?admissions.
+What important characteristic of the table variables do you need to know
+to understand the calculations used in this video?
+(a)The data are from 1973.
+(b)The columns major and gender are of class character,
+while admitted and applicants are numeric.
+(c)The data are from the dslabs package.
+(d)The column admitted is the percent of students admitted,
+while the column applicants is the total number of applicants.
+Answer:(d)
+Explanation:Several of these statements are true but not relevant to understanding the calculations in the video.
+The only statement that is critical for the analysis is that "The column admitted is the percent of students admitted,
+while the column applicants is the total number of applicants."
+In all data science projects, it is important to understand the data that you are working with.
+
+##Q6:In the example in the confounders video, major selectivity confounds the
+relationship between UC Berkeley admission rates and gender because:
+(a)It was harder for women to be admitted to UC Berkeley.
+(b)Major selectivity is associated with both admission rates and with gender,
+as women tended to apply to more selective majors.
+(c)Some majors are more selective than others.
+(d)Major selectivity is not a confounder.
+Answer:(b)
+Explanation:Major selectivity is a confounder because it is associated with both admission rate and with gender.
+
+##Q7:Admission rates at UC Berkeley are an example of Simpson’s Paradox because:
+(a)It appears that men have a higher admission rate than women, however,
+after we stratify by major, we see that on average women have a higher admission rate than men.
+(b)It was a paradox that women were being admitted at a lower rate than men.
+(c)The relationship between admissions and gender is confounded by major selectivity.
+Answer:(a)
+Explanation:Simpson’s Paradox refers specifically to cases where the sign of the correlation flips
+when comparing the entire dataset vs. specific strata, so only the first statement is correct.
+
+
+
+
+####Assessments on edX
+####Section 3: Confounding (Verified Learners only)
+
+
+For this set of exercises, we examine the data from a 2014 PNAS paper that analyzed success rates
+from funding agencies in the Netherlands and concluded:
+"our results reveal gender bias favoring male applicants over female applicants in the prioritization
+of their "quality of researcher" (but not "quality of proposal")
+evaluations and success rates, as well as in the language used in instructional and evaluation materials."
+
+A response was published a few months later titled "No evidence that gender contributes to
+personal research funding success in The Netherlands: A reaction to Van der Lee and Ellemers", which concluded:
+However, the overall gender effect borders on statistical significance, despite the large sample.
+Moreover, their conclusion could be a prime example of Simpson’s paradox;
+if a higher percentage of women apply for grants in more competitive scientific disciplines
+(i.e., with low application success rates for both men and women),
+then an analysis across all disciplines could incorrectly show "evidence" of gender inequality. 
+
+Who is right here: the original paper or the response?
+Here, you will examine the data and come to your own conclusion.
+
+The main evidence for the conclusion of the original paper comes down to a comparison of the percentages.
+The information we need was originally in Table S1 in the paper, which we include in dslabs:
+
+library(dslabs)
+data("research_funding_rates")
+research_funding_rates
+
+
+##Q1:Construct a two-by-two table of gender (men/women) by award status (awarded/not)
+using the total numbers across all disciplines.
+(a)What is the number of men not awarded?
+Answer = 1345
+(b)What is the number of women not awarded?
+Answer = 1011
+Code:The two-by-two table can be constructed using the following code:
+
+two_by_two <- research_funding_rates %>% 
+  select(-discipline) %>% 
+  summarize_all(funs(sum)) %>%
+  summarize(yes_men = awards_men, 
+            no_men = applications_men - awards_men, 
+            yes_women = awards_women, 
+            no_women = applications_women - awards_women) %>%
+  gather %>%
+  separate(key, c("awarded", "gender")) %>%
+  spread(gender, value)
+two_by_two
+
+##Q2:Use the two-by-two table from Question 1 to compute
+the percentages of men awarded versus women awarded.
+(a)What is the percentage of men awarded?
+Answer = 17.737
+(b)What is the percentage of women awarded?
+Answer = 14.89899
+Code:The percentage awarded can be calculated using the following code:
+two_by_two %>% 
+    mutate(men = round(men/sum(men)*100, 1), women = round(women/sum(women)*100, 1)) %>%
+    filter(awarded == "yes") %>%
+    pull(women)
+
+##Q3:Run a chi-squared test on the two-by-two table to determine
+whether the difference in the two success rates is significant.
+(You can use tidy() to turn the output of chisq.test() into a data frame as well.)
+What is the p-value of the difference in funding rate?
+Answer = 0.0509
+Code:The p-value can be calculated using the following code:
+two_by_two %>% select(-awarded) %>% chisq.test() %>% tidy() %>% pull(p.value)
+
+
+There may be an association between gender and funding.
+But can we infer causation here? Is gender bias causing this observed difference?
+The response to the original paper claims that what we see here is similar to the UC Berkeley admissions example.
+Specifically they state that this "could be a prime example of Simpson’s paradox;
+if a higher percentage of women apply for grants in more competitive scientific disciplines,
+then an analysis across all disciplines could incorrectly show 'evidence' of gender inequality."
+
+To settle this dispute, use this dataset with number of applications, awards, and success rate for each gender:
+
+dat <- research_funding_rates %>% 
+      mutate(discipline = reorder(discipline, success_rates_total)) %>%
+      rename(success_total = success_rates_total,
+             success_men = success_rates_men,
+             success_women = success_rates_women) %>%
+      gather(key, value, -discipline) %>%
+      separate(key, c("type", "gender")) %>%
+      spread(type, value) %>%
+      filter(gender != "total")
+dat
+To check if this is a case of Simpson's paradox, plot the success rates versus disciplines,
+which have been ordered by overall success,
+with colors to denote the genders and size to denote the number of applications.
+
+
+##Q4:
+(a)In which fields do men have a higher success rate than women?
+Select ALL that apply.
+(a)Chemical sciences;(b)Earth/life sciences; (c)Humanities
+(d)Interdisciplinary; (e)Medical sciences; (f)Physical sciences
+(g)Physics;(h)Social sciences; (i)Technical sciences
+Answer:(a), (b),(e),(g), and (h)
+
+(b)Which two fields have the most applications from women?
+Select TWO.
+(a)Chemical sciences;(b)Earth/life sciences; (c)Humanities
+(d)Interdisciplinary; (e)Medical sciences; (f)Physical sciences
+(g)Physics;(h)Social sciences; (i)Technical sciences
+Answer:(e) and (h)
+
+(c)Which two fields have the lowest overall funding rates?
+Select TWO.
+(a)Chemical sciences;(b)Earth/life sciences; (c)Humanities
+(d)Interdisciplinary; (e)Medical sciences; (f)Physical sciences
+(g)Physics;(h)Social sciences; (i)Technical sciences
+Answer:(e) and (h)
+
+Code Q4(a,b,and c): The plot can be generated using the following code:
+dat %>% 
+  ggplot(aes(discipline, success, size = applications, color = gender)) + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  geom_point()
