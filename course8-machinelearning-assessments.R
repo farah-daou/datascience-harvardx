@@ -16,7 +16,22 @@ Answer:T
 
 
 ###Assessments on edX
-###Section 2.1: Basics of Evaluating Machine Learning Algorithms
+###Section 2.1: Basics of Evaluating Machine Learning Algorithms (Part A)
+
+##Q1:For each of the following, indicate whether the outcome is continuous or categorical.
+Answer: Digit reader=categorical; Height=continuous; Spam filter=categorical;
+Stock prices=continuous; Sex=categorical
+  
+##Q2:How many features are available to us for prediction in the mnist digits dataset?
+You can download the mnist dataset using the read_mnist() function from the dslabs package.
+Answer:784
+Explanation: One way to figure out the number of features available for prediction is to download mnist and then use the ncol function, like this:
+mnist <- read_mnist()
+ncol(mnist$train$images)
+
+
+###Assessments on edX
+###Section 2.1: Basics of Evaluating Machine Learning Algorithms (Part B)
 
 The following questions all ask you to work with the dataset described below.
 The reported_heights and heights datasets were collected from three classes taught in the Departments of Computer Science and Biostatistics,
@@ -125,6 +140,13 @@ foo <- function(x){
 predictions <- apply(train[,-5],2,foo)
 sapply(predictions,max)	
 
+##My Code: I created a separated code for every feature and got the max accuracy (example below)
+accuracy_1 <- map_dbl(cutoff, function(x){
++ y_hat <- ifelse(train$Sepal.Length > x,"virginica","versicolor")
++  mean(y_hat==train$Species)
++ })
+max(accuracy_1)
+
 ##Q9:For the feature selected in Q8, use the smart cutoff value from the training data to calculate overall accuracy in the test data.
 What is the overall accuracy?
 Answer:0.90
@@ -222,7 +244,7 @@ The test is negative 90% of the time when tested on a healthy patient (high spec
 The disease is prevalent in about 2% of the community:  P(disease)=0.02 
 Here is some sample code to get you started:
   
-set.seed(1) # set.seed(1, sample.kind="Rounding") if using R 3.6 or later
+set.seed(1, sample.kind="Rounding")
 disease <- sample(c(0,1), size=1e6, replace=TRUE, prob=c(0.98,0.02))
 test <- rep(NA, 1e6)
 test[disease==0] <- sample(c(0,1), size=sum(disease==0), replace=TRUE, prob=c(0.90,0.10))
@@ -239,7 +261,7 @@ Code:mean(disease[test==0])
 ##Q4:What is the probability that you have the disease if the test is positive?
 Remember: calculate the conditional probability the disease is positive assuming a positive test.
 Answer:0.1471762
-Code:mean(disease[test==1]==1)
+Code:mean(disease[test==1]==1) OR mean(disease[test==1])
 
 ##Q5:Compare the prevalence of disease in people who test positive to the overall prevalence of disease.
 If a patient's test is positive, how much does that increase their risk of having the disease?
