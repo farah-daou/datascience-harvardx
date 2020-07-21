@@ -342,7 +342,7 @@ Answer:(a)
 
 
 ###Assessments on edX
-###Section 3.1: Linear Regression for Prediction
+###Section 3.1: Linear Regression for Prediction (Part 1)
 
 ##Q1:Create a data set using the following code:
 set.seed(1) # set.seed(1, sample.kind="Rounding") if using R 3.6 or later
@@ -514,7 +514,7 @@ adding addtional predictors does not improve the model substantially, thus RMSE 
 
 
 ###Assessments on edX
-###Section 3.1: Linear Regression for Prediction 
+###Section 3.1: Linear Regression for Prediction (Part 2)
 
 ##Q1:Define a dataset using the following code:
 
@@ -668,7 +668,7 @@ Select ALL that apply.
 (b)x <- 1:nrow(x)
 (c)x <- sweep(x, 2, 1:nrow(x),"+")
 (d)x <- sweep(x, 1, 1:nrow(x),"+")
-Answer:(d)
+Answer:(a) and (d)
 
 ##Q4:Which of the following lines of code would add the scalar 1 to column 1, the scalar 2 to column 2, and so on, for the matrix x?
 Select ALL that apply.
