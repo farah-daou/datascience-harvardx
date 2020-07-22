@@ -345,7 +345,7 @@ Answer:(a)
 ###Section 3.1: Linear Regression for Prediction (Part 1)
 
 ##Q1:Create a data set using the following code:
-set.seed(1) # set.seed(1, sample.kind="Rounding") if using R 3.6 or later
+set.seed(1, sample.kind="Rounding")
 n <- 100
 Sigma <- 9*matrix(c(1.0, 0.5, 0.5, 1.0), 2, 2)
 dat <- MASS::mvrnorm(n = 100, c(69, 69), Sigma) %>%
@@ -374,7 +374,7 @@ sd(rmse)
 
 ##Q2:Now we will repeat the exercise above but using larger datasets.
 Write a function that takes a size n, then (1) builds a dataset using the code provided at the top of Q1
-but with n observations instead of 100 and without the set.seed(1),
+but with n observations instead of 100 and without the set.seed(1,sample.kind="Rounding"),
 (2) runs the replicate() loop that you wrote to answer Q1, which builds 100 linear models and returns a vector of RMSEs,
 and (3) calculates the mean and standard deviation of the 100 RMSEs.
 Set the seed to 1 (if using R 3.6 or later, use the argument sample.kind="Rounding") and then use sapply() or map()
@@ -754,7 +754,7 @@ library(tidyverse)
 library(caret)
 data("heights")
 
-set.seed(1)
+set.seed(1, sample.kind="Rounding")
 test_index <- createDataPartition(heights$sex, times = 1, p = 0.5, list = FALSE)
 test_set <- heights[test_index, ]
 train_set <- heights[-test_index, ]     
@@ -777,7 +777,7 @@ First, set the seed to 1 and split the data into training and test sets. Then, r
 using KNN with k = 1, 3, 5, 7, 9, 11 using sapply() or map_df(). Note: use the createDataPartition() function outside of sapply() or map_df().
 Answer: k1=0.989 ; k3=0.968 ; k5=0.947 ; k7=0.916 ; k9=0.916 ; k11=0.906
 Code:
-set.seed(1)
+set.seed(1, sample.kind="Rounding")
 library(caret)
 y <- tissue_gene_expression$y
 x <- tissue_gene_expression$x
@@ -925,7 +925,7 @@ generating the random dataset and estimating the 75th quantile each time.
 What is the expected value and standard error of the 75th quantile?
 Answer: E=0.666 ;SE=0.135
 Code:
-set.seed(1)
+set.seed(1, sample.kind="Rounding")
 B <- 10000
 q_75 <- replicate(B, {
 	y <- rnorm(100, 0, 1)
@@ -936,7 +936,7 @@ mean(q_75)
 sd(q_75)
 
 ##Q4:In practice, we can't run a Monte Carlo simulation. Use the sample:
-  set.seed(1)
+set.seed(1, sample.kind="Rounding")
 y <- rnorm(100, 0, 1)
 Set the seed to 1 again after generating y and use 10 bootstrap samples
 to estimate the expected value and standard error of the 75th quantile.
@@ -954,7 +954,7 @@ sd(q_75_star)
 ##Q5:Repeat the exercise from Q4 but with 10,000 bootstrap samples instead of 10. Set the seed to 1.
 Answer: E=0.674 ; SE=0.0931
 Code:
-set.seed(1)
+set.seed(1, sample.kind="Rounding")
 indexes <- createResample(y, 10000)
 q_75_star <- sapply(indexes, function(ind){
   y_star <- y[ind]
