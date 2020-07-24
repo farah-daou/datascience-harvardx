@@ -965,9 +965,9 @@ sd(q_75_star)
   
 ##Q6:When doing bootstrap sampling, the simulated samples are drawn from the empirical distribution of the original data.
 True or False: The bootstrap is particularly useful in situations in which a tractable variance formula exists.
-Answer: False
-Explanation: False.
-The bootstrap is particularly useful in situations in which a tractable variance formula does NOT exist.
+Answer: True
+Explanation: True
+True. The bootstrap is particularly useful in situations when we do not have access to the distribution or it is unknown.
 
 
 
@@ -987,7 +987,7 @@ y <- droplevels(tissue_gene_expression$y[ind])
 x <- tissue_gene_expression$x[ind, ]
 x <- x[, sample(ncol(x), 10)]
 Use the train() function to estimate the accuracy of LDA. For this question, use the version of x and y created with the code above:
-  do not split them or tissue_gene_expression into training and test sets (understand this can lead to overfitting).
+do not split them or tissue_gene_expression into training and test sets (understand this can lead to overfitting).
 Report the accuracy from the train() results (do not make predictions).
 What is the accuracy?
 Answer:0.871
@@ -1025,13 +1025,21 @@ x <- x[, sample(ncol(x), 10)]
 Use the train() function to estimate the accuracy of QDA. For this question,
 use the entire tissue_gene_expression dataset: do not split it into training and test sets (understand this can lead to overfitting).
 What is the accuracy?
-Answer:
+Answer:0.815
 Code:
-
+fit_qda <- train(x, y, method = "qda")
+fit_qda$results["Accuracy"]
+  
 ##Q4:Which TWO genes drive the algorithm when using QDA instead of LDA (i.e. the two genes with the highest means)?
 PLCB1; RAB1B; MSH4; OAZ2; SPI1; SAPCD1; HEMK1
-Answer:
+Answer:RAB1B and OAZ2
 Code:
+t(fit_qda$finalModel$means) %>% data.frame() %>%
+ mutate(predictor_name = rownames(.)) %>%
+ ggplot(aes(cerebellum, hippocampus, label = predictor_name)) +
+ geom_point() +
+ geom_text() +
+ geom_abline()
 
 ##Q5:One thing we saw in the previous plots is that the values of the predictors correlate in both groups:
 some predictors are low in both groups and others high in both groups.
@@ -1041,8 +1049,24 @@ Re-run LDA with preProcess = "center". Note that accuracy does not change, but i
 the predictors that differ more between groups than based on the plot made in Q2.
 Which TWO genes drive the algorithm after performing the scaling?
 C21orf62; PLCB1; RAB1B; MSH4; OAZ2; SPI1; SAPCD1; IL18R1
-Answer:
+Answer:OAZ2 and SPI1
 Code:
+fit_lda <- train(x, y, method = "lda", preProcess = "center")
+fit_lda$results["Accuracy"]
+t(fit_lda$finalModel$means) %>% data.frame() %>%
+ mutate(predictor_name = rownames(.)) %>%
+ ggplot(aes(predictor_name, hippocampus)) +
+ geom_point() +
+ coord_flip()
+
+You can see that it is different genes driving the algorithm now. This is because the predictor means change.
+In the previous exercises we saw that both LDA and QDA approaches worked well.
+For further exploration of the data, you can plot the predictor values for the two genes with the largest differences between the two groups
+in a scatter plot to see how they appear to follow a bivariate distribution as assumed by the LDA and QDA approaches,
+coloring the points by the outcome, using the following code:
+d <- apply(fit_lda$finalModel$means, 2, diff)
+ind <- order(abs(d), decreasing = TRUE)[1:2]
+plot(x[, ind], col = y)
 
 ##Q6:Now we are going to increase the complexity of the challenge slightly.
 Repeat the LDA analysis from Q5 but using all tissue types. Use the following code to create your dataset:
@@ -1055,8 +1079,12 @@ y <- tissue_gene_expression$y
 x <- tissue_gene_expression$x
 x <- x[, sample(ncol(x), 10)]
 What is the accuracy using LDA?
-Answer:
+Answer:0.819
 Code:
+fit_lda <- train(x, y, method = "lda", preProcess = c("center"))
+fit_lda$results["Accuracy"]
+We see that the results are slightly worse when looking at all of the tissue types instead of only selected ones.
+You can use the confusionMatrix function to learn more about what type of errors we are making, like this: confusionMatrix(fit_lda)
 
 
 
