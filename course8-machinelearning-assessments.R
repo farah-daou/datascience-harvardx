@@ -1090,76 +1090,144 @@ You can use the confusionMatrix function to learn more about what type of errors
 
 
 ###Assessments on edX
-###Section : 
+###Section 5.1: Classification with More than Two Classes
 
-Q1:
-Answer:
-Code:
+##Q1:Create a simple dataset where the outcome grows 0.75 units on average for every increase in a predictor, using this code:
+library(rpart)
+n <- 1000
+sigma <- 0.25
+set.seed(1) #set.seed(1, sample.kind = "Rounding") if using R 3.6 or later
+x <- rnorm(n, 0, 1)
+y <- 0.75 * x + rnorm(n, 0, sigma)
+dat <- data.frame(x = x, y = y)
 
-Q2:
-Answer:
-Code:
+Which code correctly uses rpart() to fit a regression tree and saves the result to fit?
+(a)fit <- rpart(y ~ .) 
+(b)fit <- rpart(y, ., data = dat) 
+(c)fit <- rpart(x ~ ., data = dat) 
+(d)fit <- rpart(y ~ ., data = dat)
+Answer:(d)
 
-Q3:
-Answer:
-Code:
+##Q2:Which of the following plots has the same tree shape obtained in Q1?
+Answer:(d)
+Code: The plot can be made using the following code:
+plot(fit)
+text(fit)
 
-Q4:
-Answer:
-Code:
+##Q3:Below is most of the code to make a scatter plot of y versus x along with the predicted values based on the fit.
+dat %>% 
+  mutate(y_hat = predict(fit)) %>% 
+  ggplot() +
+  geom_point(aes(x, y)) +
+  #BLANK
+  
+Which line of code should be used to replace #BLANK in the code above?
+(a)geom_step(aes(x, y_hat), col=2)
+(b)geom_smooth(aes(y_hat, x), col=2)
+(c)geom_quantile(aes(x, y_hat), col=2)
+(d)geom_step(aes(y_hat, x), col=2)
+Answer:(a)
 
-Q5:
-Answer:
-Code:
+##Q4:Now run Random Forests instead of a regression tree using randomForest() from the randomForest package,
+and remake the scatterplot with the prediction line. Part of the code is provided for you below.
+library(randomForest)
+fit <- #BLANK 
+  dat %>% 
+  mutate(y_hat = predict(fit)) %>% 
+  ggplot() +
+  geom_point(aes(x, y)) +
+  geom_step(aes(x, y_hat), col = "red")
+    
+What code should replace #BLANK in the provided code?
+(a)randomForest(y ~ x, data = dat)
+(b)randomForest(x ~ y, data = dat)
+(c)randomForest(y ~ x, data = data)
+(d)randomForest(x ~ y)
+Answer:(a)
 
-Q6:
-Answer:
-Code:
+##Q5:Use the plot() function to see if the Random Forest from Q4 has converged or if we need more trees.
+Which of these graphs is produced by plotting the random forest?
+Answer:(c)
+Code: plot(fit)
 
-Q7:
-Answer:
-Code:
+##Q6:It seems that the default values for the Random Forest result in an estimate that is too flexible (unsmooth).
+Re-run the Random Forest but this time with a node size of 50 and a maximum of 25 nodes. Remake the plot.
+Part of the code is provided for you below.
+library(randomForest)
+fit <- #BLANK
+  dat %>% 
+  mutate(y_hat = predict(fit)) %>% 
+  ggplot() +
+  geom_point(aes(x, y)) +
+  geom_step(aes(x, y_hat), col = "red")
 
-Q8:
-Answer:
-Code:
+What code should replace #BLANK in the provided code?
+(a)randomForest(y ~ x, data = dat, nodesize = 25, maxnodes = 25)
+(b)randomForest(y ~ x, data = dat, nodes = 50, max = 25)
+(c)randomForest(x ~ y, data = dat, nodes = 50, max = 25)
+(d)randomForest(y ~ x, data = dat, nodesize = 50, maxnodes = 25)
+(e)randomForest(x ~ y, data = dat, nodesize = 50, maxnodes = 25)
+Answer:(d)
+Explanation:We see that using randomForest(y ~ x, data = dat, nodesize = 50, maxnodes = 25) yields smoother results.
+We'll pick up with this exercise after we learn more about the caret package.
 
 
 ###Assessments on edX
-###Section : 
+###Section 5.2: Caret Package
 
-Q1:
+##Q1:Load the rpart package and then use the caret::train() function with method = "rpart" to fit a classification tree to the tissue_gene_expression dataset.
+Try out cp values of seq(0, 0.1, 0.01). Plot the accuracies to report the results of the best model. Set the seed to 1991.
+Which value of cp gives the highest accuracy?
+Answer:0
+Code:
+library(caret)
+library(rpart)          
+library(dslabs)
+set.seed(1991)
+data("tissue_gene_expression")
+fit <- with(tissue_gene_expression, 
+                train(x, y, method = "rpart",
+                      tuneGrid = data.frame(cp = seq(0, 0.1, 0.01))))
+ggplot(fit)
+
+##Q2:Note that there are only 6 placentas in the dataset. By default, rpart() requires 20 observations before splitting a node.
+That means that it is difficult to have a node in which placentas are the majority.
+Rerun the analysis you did in the exercise in Q1, but this time, also allow rpart() to split any node by using the argument control = rpart.control(minsplit = 0).
+Look at the confusion matrix again to determine whether the accuracy increases. Again, set the seed to 1991.
+What is the accuracy now?
+Answer:0.9141
+Code:
+library(rpart)
+set.seed(1991)
+data("tissue_gene_expression")
+fit_rpart <- with(tissue_gene_expression, 
+                      train(x, y, method = "rpart",
+                            tuneGrid = data.frame(cp = seq(0, 0.10, 0.01)),
+                            control = rpart.control(minsplit = 0)))
+ggplot(fit_rpart)
+confusionMatrix(fit_rpart)
+
+##Q3:Plot the tree from the best fitting model of the analysis you ran in Q2.
+Which gene is at the first split?
+B3GNT4; CAPN3; CES2; CFHR4; CLIP3; GPA33; HRH1
+Answer: GPA33
+Code:The first split is at GPA33 >= 8.794. The following code will give the tree:
+plot(fit_rpart$finalModel)
+text(fit_rpart$finalModel)
+
+##Q4:
 Answer:
 Code:
 
-Q2:
+##Q5:Use the function varImp() on the output of train() and save it to an object called imp:
+imp <- #BLANK
+What should replace #BLANK in the code above?
+Do not include spaces in your answer.
+Answer:varImp(fit)
+
+##Q6:
 Answer:
 Code:
-
-Q3:
-Answer:
-Code:
-
-Q4:
-Answer:
-Code:
-
-Q5:
-Answer:
-Code:
-
-Q6:
-Answer:
-Code:
-
-Q7:
-Answer:
-Code:
-
-Q8:
-Answer:
-Code:
-
 
 
 ###Assessments on edX
