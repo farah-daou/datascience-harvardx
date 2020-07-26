@@ -1215,9 +1215,23 @@ Code:The first split is at GPA33 >= 8.794. The following code will give the tree
 plot(fit_rpart$finalModel)
 text(fit_rpart$finalModel)
 
-##Q4:
-Answer:
+##Q4:We can see that with just seven genes, we are able to predict the tissue type.
+Now let's see if we can predict the tissue type with even fewer genes using a Random Forest.
+Use the train() function and the rf method to train a Random Forest model and save it to an object called fit.
+Try out values of mtry ranging from seq(50, 200, 25) (you can also explore other values on your own). What mtry value maximizes accuracy?
+To permit small nodesize to grow as we did with the classification trees, use the following argument: nodesize = 1.
+Note: This exercise will take some time to run. If you want to test out your code first, try using smaller values with ntree.
+Set the seed to 1991 again.
+What value of mtry maximizes accuracy?
+Answer:100
 Code:
+set.seed(1991, sample.kind="Rounding")
+library(randomForest)
+fit <- with(tissue_gene_expression, 
+            train(x, y, method = "rf", 
+                  nodesize = 1,
+                  tuneGrid = data.frame(mtry = seq(50, 200, 25))))
+ggplot(fit)
 
 ##Q5:Use the function varImp() on the output of train() and save it to an object called imp:
 imp <- #BLANK
@@ -1225,9 +1239,20 @@ What should replace #BLANK in the code above?
 Do not include spaces in your answer.
 Answer:varImp(fit)
 
-##Q6:
-Answer:
-Code:
+##Q6:he rpart() model we ran above produced a tree that used just seven predictors.
+Extracting the predictor names is not straightforward, but can be done. If the output of the call to train was fit_rpart, we can extract the names like this:
+tree_terms <- as.character(unique(fit_rpart$finalModel$frame$var[!(fit_rpart$finalModel$frame$var == "<leaf>")]))
+tree_terms
+
+Calculate the variable importance in the Random Forest call from Q4 for these seven predictors and examine where they rank.
+What is the importance of the CFHR4 gene in the Random Forest call?
+Answer:35.0
+What is the rank of the CFHR4 gene in the Random Forest call?
+Answer:7
+Code:The following code can be used to calculate the rank and importance in the Random Forest call for the predictors from the rpart() model:
+data_frame(term = rownames(imp$importance), importance = imp$importance$Overall) %>%
+ mutate(rank = rank(-importance)) %>% arrange(desc(importance)) %>%
+ filter(term %in% tree_terms)
 
 
 ###Assessments on edX
