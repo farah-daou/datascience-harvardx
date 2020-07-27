@@ -1258,37 +1258,343 @@ data_frame(term = rownames(imp$importance), importance = imp$importance$Overall)
 ###Assessments on edX
 ###Section : 
 
-Q1:
-Answer:
-Code:
+Titanic Exercises
+These exercises cover everything you have learned in this course so far.
+You will use the background information to provided to train a number of different types of models on this dataset.
 
-Q2:
-Answer:
-Code:
+Background
+The Titanic was a British ocean liner that struck an iceberg and sunk on its maiden voyage in 1912 from the United Kingdom to New York.
+More than 1,500 of the estimated 2,224 passengers and crew died in the accident, making this one of the largest maritime disasters ever outside of war.
+The ship carried a wide range of passengers of all ages and both genders, from luxury travelers in first-class to immigrants in the lower classes.
+However, not all passengers were equally likely to survive the accident. You will use real data about a selection of 891 passengers to predict which passengers survived.
 
-Q3:
-Answer:
-Code:
+Libraries and data
+Use the titanic_train data frame from the titanic library as the starting point for this project.
 
-Q4:
-Answer:
-Code:
+library(titanic)    # loads titanic_train data frame
+library(caret)
+library(tidyverse)
+library(rpart)
 
-Q5:
-Answer:
-Code:
+# 3 significant digits
+options(digits = 3)
 
-Q6:
-Answer:
-Code:
+# clean the data - `titanic_train` is loaded with the titanic package
+titanic_clean <- titanic_train %>%
+  mutate(Survived = factor(Survived),
+         Embarked = factor(Embarked),
+         Age = ifelse(is.na(Age), median(Age, na.rm = TRUE), Age), # NA age to median age
+         FamilySize = SibSp + Parch + 1) %>%    # count family members
+  select(Survived,  Sex, Pclass, Age, Fare, SibSp, Parch, FamilySize, Embarked)
 
-Q7:
-Answer:
+##Q1:Split titanic_clean into test and training sets - after running the setup code, it should have 891 rows and 9 variables.
+Set the seed to 42, then use the caret package to create a 20% data partition based on the Survived column. Assign the 20% partition to test_set and the remaining 80% partition to train_set.
+How many observations are in the training set?
+Answer: 712
+How many observations are in the test set?
+Answer: 179
+What proportion of individuals in the training set survived? 
+Answer: 0.383
 Code:
+set.seed(42, sample.kind = "Rounding")
+test_index <- createDataPartition(titanic_clean$Survived, times = 1, p = 0.2, list = FALSE) # create a 20% test set
+test_set <- titanic_clean[test_index,]
+train_set <- titanic_clean[-test_index,]
+nrow(train_set)
+nrow(test_set)
+mean(train_set$Survived == 1)
 
-Q8:
-Answer:
+##Q2:The simplest prediction method is randomly guessing the outcome without using additional predictors.
+These methods will help us determine whether our machine learning algorithm performs better than chance. How accurate are two methods of guessing Titanic passenger survival?
+Set the seed to 3. For each individual in the test set, randomly guess whether that person survived or not by sampling from the vector c(0,1)
+(Note: use the default argument setting of prob from the sample function). Assume that each person has an equal chance of surviving or not surviving.
+What is the accuracy of this guessing method?
+Answer: 0.542 or 0.475
 Code:
+set.seed(3, sample.kind = "Rounding")
+# guess with equal probability of survival
+guess <- sample(c(0,1), nrow(test_set), replace = TRUE)
+mean(guess == test_set$Survived)
+
+##Q3a:Use the training set to determine whether members of a given sex were more likely to survive or die.
+Apply this insight to generate survival predictions on the test set.
+What proportion of training set females survived?
+Answer: 0.733 or 0.731
+What proportion of training set males survived?
+Answer: 0.193 or 0.197
+Code:
+train_set %>%
+  group_by(Sex) %>%
+  summarize(Survived = mean(Survived == 1)) %>%
+  filter(Sex == "female") %>%
+  pull(Survived)
+train_set %>%
+  group_by(Sex) %>%
+  summarize(Survived = mean(Survived == 1)) %>%
+  filter(Sex == "male") %>%
+  pull(Survived)
+
+##Q3b:Predict survival using sex on the test set: if the survival rate for a sex is over 0.5, predict survival for all individuals of that sex,
+and predict death if the survival rate for a sex is under 0.5.
+What is the accuracy of this sex-based prediction method on the test set?
+Answer: 0.81 or 0.821
+Code:
+sex_model <- ifelse(test_set$Sex == "female", 1, 0)    # predict Survived=1 if female, 0 if male
+mean(sex_model == test_set$Survived)    # calculate accuracy
+
+##Q4a:In the training set, which class(es) (Pclass) were passengers more likely to survive than die?
+Select ALL that apply.
+(a)1; (b)2; (c)3
+Answer:(a)
+Code:
+train_set %>%
+  group_by(Pclass) %>%
+  summarize(Survived = mean(Survived == 1)
+  
+##Q4b:Predict survival using passenger class on the test set: predict survival if the survival rate for a class is over 0.5, otherwise predict death.
+What is the accuracy of this class-based prediction method on the test set?
+Answer: 0.682 or 0.704
+Code:
+class_model <- ifelse(test_set$Pclass == 1, 1, 0)    # predict survival only if first class
+mean(class_model == test_set$Survived)    # calculate accuracy
+
+##Q4c:Use the training set to group passengers by both sex and passenger class.
+Which sex and class combinations were more likely to survive than die?
+Select ALL that apply.
+(a)female 1st class
+(b)female 2nd class
+(c)female 3rd class
+(d)male 1st class
+(e)male 2nd class
+(f)male 3rd class
+Answer: (a) and (b)
+Code:
+train_set %>%
+  group_by(Sex, Pclass) %>%
+  summarize(Survived = mean(Survived == 1)) %>%
+  filter(Survived > 0.5)
+
+##Q4d:Predict survival using both sex and passenger class on the test set.
+Predict survival if the survival rate for a sex/class combination is over 0.5, otherwise predict death.
+What is the accuracy of this sex- and class-based prediction method on the test set?
+Answer: 0.793 or 0.821
+Code:
+sex_class_model <- ifelse(test_set$Sex == "female" & test_set$Pclass != 3, 1, 0)
+mean(sex_class_model == test_set$Survived)
+
+OR
+
+sex_class_model <- ifelse(test_set$Pclass == 1 & test_set$Sex == "female" | test_set$Pclass ==2 & test_set$Sex == "female", 1, 0)
+mean(sex_class_model == test_set$Survived)
+
+##Q5a:Use the confusionMatrix() function to create confusion matrices for the sex model, class model, and combined sex and class model.
+You will need to convert predictions and survival status to factors to use this function.
+What is the "positive" class used to calculate confusion matrix metrics?
+0; 1
+Answer: 0
+Which model has the highest sensitivity?
+(a)sex only
+(b)class only
+(c)sex and class combined
+Answer: (c)
+Which model has the highest specificity?
+(a)sex only
+(b)class only
+(c)sex and class combined
+Answer: (a)
+Which model has the highest balanced accuracy?
+(a)sex only
+(b)class only
+(c)sex and class combined
+Answer: (a)
+
+##Q5b:What is the maximum value of balanced accuracy?
+Answer: 0.806 or 0.791
+Code:
+confusionMatrix(data = factor(sex_model), reference = factor(test_set$Survived))
+confusionMatrix(data = factor(class_model), reference = factor(test_set$Survived))
+confusionMatrix(data = factor(sex_class_model), reference = factor(test_set$Survived))
+
+##Q6:Use the F_meas() function to calculate  F1  scores for the sex model, class model, and combined sex and class model.
+You will need to convert predictions to factors to use this function.
+Which model has the highest  F1  score?
+(a)sex only
+(b)class only
+(c)sex and class combined
+Answer: (c)
+What is the maximum value of the  F1  score?
+Answer: 0.872
+Code:
+F_meas(data = factor(sex_model), reference = test_set$Survived)
+F_meas(data = factor(class_model), reference = test_set$Survived)
+F_meas(data = factor(sex_class_model), reference = test_set$Survived)
+
+##Q7:Set the seed to 1. Train a model using linear discriminant analysis (LDA) with the caret lda method using fare as the only predictor.
+What is the accuracy on the test set for the LDA model?
+Answer: 0.659 or 0.693
+Code:
+set.seed(1, sample.kind = "Rounding")
+train_lda <- train(Survived ~ Fare, method = "lda", data = train_set)
+lda_preds <- predict(train_lda, test_set)
+mean(lda_preds == test_set$Survived)
+OR
+confusionMatrix(lda_preds, test_set$Survived)$overall["Accuracy"]
+
+Set the seed to 1. Train a model using quadratic discriminant analysis (QDA) with the caret qda method using fare as the only predictor.
+What is the accuracy on the test set for the QDA model?
+Answer: 0.659 or 0.693
+Code:
+set.seed(1, sample.kind = "Rounding")
+train_qda <- train(Survived ~ Fare, method = "qda", data = train_set)
+qda_preds <- predict(train_qda, test_set)
+mean(qda_preds == test_set$Survived)
+OR
+confusionMatrix(qda_preds, test_set$Survived)$overall["Accuracy"]
+  
+##Q8:
+Set the seed to 1. Train a logistic regression model with the caret glm method using age as the only predictor.
+What is the accuracy on the test set using age as the only predictor?
+Answer: 0.615
+Code:
+set.seed(1, sample.kind = "Rounding")
+train_glm_age <- train(Survived ~ Age, method = "glm", data = train_set)
+glm_preds_age <- predict(train_glm_age, test_set)
+mean(glm_preds_age == test_set$Survived)
+
+Set the seed to 1. Train a logistic regression model with the caret glm method using four predictors: sex, class, fare, and age.
+What is the accuracy on the test set using these four predictors?
+Answer: 0.821 or 0.849
+Code:
+set.seed(1, sample.kind = "Rounding")
+train_glm <- train(Survived ~ Sex + Pclass + Fare + Age, method = "glm", data = train_set)
+glm_preds <- predict(train_glm, test_set)
+mean(glm_preds == test_set$Survived)
+
+Set the seed to 1. Train a logistic regression model with the caret glm method using all predictors. Ignore warnings about rank-deficient fit.
+What is the accuracy on the test set using all predictors?
+Answer: 0.827 or 0.849
+Code:
+set.seed(1, sample.kind = "Rounding")
+train_glm_all <- train(Survived ~ ., method = "glm", data = train_set)
+glm_all_preds <- predict(train_glm_all, test_set)
+mean(glm_all_preds == test_set$Survived)
+    
+##Q9a:Set the seed to 6. Train a kNN model on the training set using the caret train function.
+Try tuning with k = seq(3, 51, 2).
+What is the optimal value of the number of neighbors k?
+Answer: 11
+Code:
+set.seed(6, sample.kind = "Rounding")
+train_knn <- train(Survived ~ .,
+                   method = "knn",
+                   data = train_set,
+                   tuneGrid = data.frame(k = seq(3, 51, 2)))
+train_knn$bestTune
+
+##Q9b:Plot the kNN model to investigate the relationship between the number of neighbors and accuracy on the training set.
+Of these values of  k , which yields the highest accuracy?
+(a)7 ; (b)11 ; (c)17 ; (d)21
+Answer: 11
+Code:
+ggplot(train_knn)
+ 
+##Q9c:What is the accuracy of the kNN model on the test set?
+Answer: 0.709
+Code:
+knn_preds <- predict(train_knn, test_set)
+mean(knn_preds == test_set$Survived)
+    
+##Q10:Set the seed to 8 and train a new kNN model. Instead of the default training control, use 10-fold cross-validation where each partition consists of 10% of the total.
+What is the optimal value of k using cross-validation?
+Answer: 5
+Code:
+set.seed(8, sample.kind = "Rounding") 
+train_knn_cv <- train(Survived ~ .,
+                      method = "knn",
+                      data = train_set,
+                      tuneGrid = data.frame(k = seq(3, 51, 2)),
+                      trControl = trainControl(method = "cv", number = 10, p = 0.9))
+train_knn_cv$bestTune
+
+What is the accuracy on the test set using the cross-validated kNN model?
+Answer: 0.648
+Code:
+knn_cv_preds <- predict(train_knn_cv, test_set)
+mean(knn_cv_preds == test_set$Survived)
+  
+##Q11a:Set the seed to 10. Use caret to train a decision tree with the rpart method.
+Tune the complexity parameter with cp = seq(0, 0.05, 0.002).
+What is the optimal value of the complexity parameter (cp)?
+Answer: 0.02 or 0.016
+Code:
+set.seed(10, sample.kind = "Rounding")
+train_rpart <- train(Survived ~ ., 
+                     method = "rpart",
+                     tuneGrid = data.frame(cp = seq(0, 0.05, 0.002)),
+                     data = train_set)
+
+train_rpart$bestTune
+What is the accuracy of the decision tree model on the test set?
+Answer: 0.849 or 0.838
+Code:
+rpart_preds <- predict(train_rpart, test_set)
+mean(rpart_preds == test_set$Survived)
+ 
+##Q11b:Inspect the final model and plot the decision tree.
+Which variables are used in the decision tree?
+Select ALL that apply.
+Survived; Sex; Pclass; Age; Fare; Parch; Embarked
+Answer: Sex, Pclass, Age, and Fare
+Code:
+train_rpart$finalModel # inspect final model
+# make plot of decision tree
+plot(train_rpart$finalModel, margin = 0.1)
+text(train_rpart$finalModel)
+  
+##Q11c:Using the decision rules generated by the final model, predict whether the following individuals would survive.
+A 28-year-old male
+Answer: would NOT survive
+A female in the second passenger class
+Answer: would survive
+A third-class female who paid a fare of $8
+Answer: would survive
+A 5-year-old male with 4 siblings
+Answer: would NOT survive
+A third-class female who paid a fare of $25
+Answer: would NOT survive
+A first-class 17-year-old female with 2 siblings
+Answer: would survive
+A first-class 17-year-old male with 2 siblings
+Answer: would NOT survive
+Explanation: For each case, follow the decision tree to determine whether it results in survived=0 (didn't survive) or survived=1 (did survive).
+   
+##Q12:Set the seed to 14. Use the caret train() function with the rf method to train a random forest. Test values of mtry ranging from 1 to 7. Set ntree to 100.
+What mtry value maximizes accuracy?
+Answer: 3 or 2
+Code:
+set.seed(14, sample.kind = "Rounding")
+train_rf <- train(Survived ~ .,
+                  data = train_set,
+                  method = "rf",
+                  ntree = 100,
+                  tuneGrid = data.frame(mtry = seq(1:7)))
+train_rf$bestTune
+
+What is the accuracy of the random forest model on the test set?
+Answer: 0.877 or 0.844
+Code: 
+rf_preds <- predict(train_rf, test_set)
+mean(rf_preds == test_set$Survived)
+
+Use varImp() on the random forest model object to determine the importance of various predictors to the random forest model.
+What is the most important variable?
+Be sure to report the variable name exactly as it appears in the code.
+Answer: Sexmale
+Code: varImp(train_rf)    # first row
+
+    
+  
+  
 
 ###Assessments on edX
 ###Section : 
