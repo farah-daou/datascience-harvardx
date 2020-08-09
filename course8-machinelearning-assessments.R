@@ -1256,7 +1256,7 @@ data_frame(term = rownames(imp$importance), importance = imp$importance$Overall)
 
 
 ###Assessments on edX
-###Section : 
+###Section 5.3: Titanic Exercises
 
 Titanic Exercises
 These exercises cover everything you have learned in this course so far.
@@ -1591,44 +1591,655 @@ What is the most important variable?
 Be sure to report the variable name exactly as it appears in the code.
 Answer: Sexmale
 Code: varImp(train_rf)    # first row
-
     
   
   
 
 ###Assessments on edX
-###Section : 
+###Section 6.1: Case Study: MNIST 
+
+For these exercises we are going to build several machine learning models for the mnist_27 dataset and then build an ensemble.
+Each of the exercises in this comprehension check builds on the last.
+
+##Q1:Use the training set to build a model with several of the models available from the caret package.
+We will test out 10 of the most common machine learning models in this exercise:
+models <- c("glm", "lda", "naive_bayes", "svmLinear", "knn", "gamLoess", "multinom", "qda", "rf", "adaboost")
+    
+Apply all of these models using train() with all the default parameters.
+You may need to install some packages. Keep in mind that you will probably get some warnings. Also, it will probably take a while to train all of the models - be patient!
+Run the following code to train the various models:
+library(caret)
+library(dslabs)
+set.seed(1) # use `set.seed(1, sample.kind = "Rounding")` in R 3.6 or later
+data("mnist_27")
+
+fits <- lapply(models, function(model){ 
+	print(model)
+	train(y ~ ., method = model, data = mnist_27$train)
+}) 
+    
+names(fits) <- models
+    
+Did you train all of the models?
+Answer:Yes
+
+##Q2:Now that you have all the trained models in a list, use sapply() or map() to create a matrix of predictions for the test set.
+You should end up with a matrix with length(mnist_27$test$y) rows and length(models) columns.
+What are the dimensions of the matrix of predictions?
+Number of rows:
+Number of columns:
+Code:
+
+##Q3:Now compute accuracy for each model on the test set.
+Report the mean accuracy across all models.
+Answer:
+Code:
+
+##Q4:Next, build an ensemble prediction by majority vote and compute the accuracy of the ensemble.
+Vote 7 if more than 50% of the models are predicting a 7, and 2 otherwise.
+What is the accuracy of the ensemble?
+Answer:
+Code:
+
+##Q5:In Q3, we computed the accuracy of each method on the test set and noticed that the individual accuracies varied.
+How many of the individual methods do better than the ensemble?
+Answer:
+Code:
+
+Which individual methods perform better than the ensemble?
+Select ALL that apply.
+glm; lda; naive_bayes; svmLinear; knn; gamLoess; multinom; qda; rf; adaboost
+Answer:
+Code:
+
+##Q6:It is tempting to remove the methods that do not perform well and re-do the ensemble.
+The problem with this approach is that we are using the test data to make a decision.
+However, we could use the minimum accuracy estimates obtained from cross validation with the training data for each model.
+Obtain these estimates and save them in an object.
+Report the mean of these training set accuracy estimates.
+What is the mean of these training set accuracy estimates?
+Answer:
+Code:
+
+##Q7:Now let's only consider the methods with an estimated accuracy of greater than or equal to 0.8 when constructing the ensemble. Vote 7 if 50% or more of the models are predicting a 7, and 2 otherwise.
+What is the accuracy of the ensemble now?
+Answer:
+Code:
+
+
+
+
+###Assessments on edX
+###Section 6.2: Recommendation Systems
+
+The following exercises all work with the movielens data, which can be loaded using the following code:
+library(tidyverse)
+library(lubridate)
+library(dslabs)
+data("movielens")
+
+##Q1:Compute the number of ratings for each movie and then plot it against the year the movie came out.
+Use the square root transformation on the counts.
+What year has the highest median number of ratings?
+Answer:
+Code:
+
+##Q2:We see that, on average, movies that came out after 1993 get more ratings.
+We also see that with newer movies, starting in 1993, the number of ratings decreases with year: the more recent a movie is, the less time users have had to rate it.
+Among movies that came out in 1993 or later, select the top 25 movies with the highest average number of ratings per year (n/year), and caculate the average rating of each of them.
+To calculate number of ratings per year, use 2018 as the end year.
+What is the average rating for the movie The Shawshank Redemption?
+Answer: 
+Code:
+What is the average number of ratings per year for the movie Forrest Gump?
+Answer:
+Code:
+
+##Q3:From the table constructed in Q2, we can see that the most frequently rated movies tend to have above average ratings.
+This is not surprising: more people watch popular movies.
+To confirm this, stratify the post-1993 movies by ratings per year and compute their average ratings.
+To calculate number of ratings per year, use 2018 as the end year. Make a plot of average rating versus ratings per year and show an estimate of the trend.
+What type of trend do you observe?
+(a)There is no relationship between how often a movie is rated and its average rating.
+(b)Movies with very few and very many ratings have the highest average ratings.
+(c)The more often a movie is rated, the higher its average rating.
+(d)The more often a movie is rated, the lower its average rating
+Answer:
+Code:
+
+##Q4:Suppose you are doing a predictive analysis in which you need to fill in the missing ratings with some value.
+Given your observations in the exercise in Q3, which of the following strategies would be most appropriate?
+(a)Fill in the missing values with the average rating across all movies.
+(b)Fill in the missing values with 0.
+(c)Fill in the missing values with a lower value than the average rating across all movies.
+(d)Fill in the value with a higher value than the average rating across all movies.
+(e)None of the above
+Answer:
+Code:
+
+##Q5:The movielens dataset also includes a time stamp.
+This variable represents the time and data in which the rating was provided.
+The units are seconds since January 1, 1970. Create a new column date with the date.
+Which code correctly creates this new column?
+(a)movielens <- mutate(movielens, date = as.date(timestamp))
+(b)movielens <- mutate(movielens, date = as_datetime(timestamp))
+(c)movielens <- mutate(movielens, date = as.data(timestamp))
+(d)movielens <- mutate(movielens, date = timestamp)
+Answer:
+Code:
+  
+##Q6:Compute the average rating for each week and plot this average against date.
+Hint: use the round_date() function before you group_by().
+What type of trend do you observe?
+(a)There is very strong evidence of a time effect on average rating.
+(b)There is some evidence of a time effect on average rating.
+(c)There is no evidence of a time effect on average rating (straight horizontal line).
+Answer:
+Code:
+  
+##Q7:Consider again the plot you generated in Q6.
+If we define  du,i  as the day for user's  u  rating of movie  i , which of the following models is most appropriate?
+(a)Yu,i=μ+bi+bu+du,i+εu,i 
+(b)Yu,i=μ+bi+bu+du,iβ+εu,i 
+(c)Yu,i=μ+bi+bu+du,iβi+εu,i 
+(d)Yu,i=μ+bi+bu+f(du,i)+εu,i , with  f  a smooth function of  du,i
+Answer:
+Code:
+  
+##Q8:The movielens data also has a genres column.
+This column includes every genre that applies to the movie.
+Some movies fall under several genres. Define a category as whatever combination appears in this column. Keep only categories with more than 1,000 ratings.
+Then compute the average and standard error for each category.
+Plot these as error bar plots.
+Which genre has the lowest average rating?
+Enter the name of the genre exactly as reported in the plot, including capitalization and punctuation.
+Answer:
+Code:
+
+##Q9:The plot you generated in Q8 shows strong evidence of a genre effect. Consider this plot as you answer the following question.
+If we define  gu,i  as the genre for user  u 's rating of movie  i , which of the following models is most appropriate?
+(a)Yu,i=μ+bi+bu+gu,i+εu,i 
+(b)Yu,i=μ+bi+bu+gu,iβ+εu,i 
+(c)Yu,i=μ+bi+bu+∑Kk=1xku,iβk+εu,i , with  xku,i=1  if  gu,i  is genre  k 
+(d)Yu,i=μ+bi+bu+f(gu,i)+εu,i , with  f  a smooth function of  gu,i
+Answer:
+Code:
+  
+  
+###Assessments on edX
+###Section 6.3: Regularization (Part 1)
+
+The exercises in Q1-Q8 work with a simulated dataset for 1000 schools.
+This pre-exercise setup walks you through the code needed to simulate the dataset.
+If you have not done so already since the Titanic Exercises, please restart R or reset the number of digits that are printed with options(digits=7).
+An education expert is advocating for smaller schools.
+The expert bases this recommendation on the fact that among the best performing schools, many are small schools. Let's simulate a dataset for 1000 schools.
+First, let's simulate the number of students in each school, using the following code:
+  
+set.seed(1986, sample.kind="Rounding")
+n <- round(2^rnorm(1000, 8, 1))
+Now let's assign a true quality for each school that is completely independent from size.
+This is the parameter we want to estimate in our analysis. The true quality can be assigned using the following code:
+
+set.seed(1, sample.kind="Rounding")
+mu <- round(80 + 2*rt(1000, 5))
+range(mu)
+schools <- data.frame(id = paste("PS",1:1000),
+                      size = n,
+                      quality = mu,
+                      rank = rank(-mu))
+                      
+We can see the top 10 schools using this code: 
+schools %>% top_n(10, quality) %>% arrange(desc(quality))
+Now let's have the students in the school take a test.
+There is random variability in test taking, so we will simulate the test scores as normally distributed with the average
+determined by the school quality with a standard deviation of 30 percentage points.
+This code will simulate the test scores:
+  
+set.seed(1, sample.kind="Rounding")
+mu <- round(80 + 2*rt(1000, 5))
+
+scores <- sapply(1:nrow(schools), function(i){
+  scores <- rnorm(schools$size[i], schools$quality[i], 30)
+  scores
+})
+schools <- schools %>% mutate(score = sapply(scores, mean))
+
+##Q1:What are the top schools based on the average score?
+Show just the ID, size, and the average score.
+Report the ID of the top school and average score of the 10th school.
+What is the ID of the top school?
+Note that the school IDs are given in the form "PS x" - where x is a number.
+Report the number only.
+Answer:
+Code:
+
+What is the average score of the 10th school?
+Answer:
+Code:
+  
+##Q2:Compare the median school size to the median school size of the top 10 schools based on the score.
+What is the median school size overall?
+Answer:
+Code: 
+
+What is the median school size of the of the top 10 schools based on the score?
+Answer:
+Code:
+  
+##Q3:According to this analysis, it appears that small schools produce better test scores than large schools.
+Four out of the top 10 schools have 100 or fewer students.
+But how can this be? We constructed the simulation so that quality and size were independent.
+Repeat the exercise for the worst 10 schools.
+What is the median school size of the bottom 10 schools based on the score?
+Answer:
+Code:
+  
+##Q4:From this analysis, we see that the worst schools are also small. Plot the average score versus school size to see what's going on. Highlight the top 10 schools based on the true quality.
+What do you observe?
+(a)There is no difference in the standard error of the score based on school size; there must be an error in how we generated our data.
+(b)The standard error of the score has larger variability when the school is smaller, which is why both the best and the worst schools are more likely to be small.
+(c)The standard error of the score has smaller variability when the school is smaller, which is why both the best and the worst schools are more likely to be small.
+(d)The standard error of the score has larger variability when the school is very small or very large, which is why both the best and the worst schools are more likely to be small.
+(e)The standard error of the score has smaller variability when the school is very small or very large, which is why both the best and the worst schools are more likely to be small.
+Answer:
+Code:
+  
+##Q5:Let's use regularization to pick the best schools. Remember regularization shrinks deviations from the average towards 0.
+To apply regularization here, we first need to define the overall average for all schools, using the following code:
+overall <- mean(sapply(scores, mean))
+Then, we need to define, for each school, how it deviates from that average.
+Write code that estimates the score above the average for each school but dividing by n+α instead of n, with n the school size and α a regularization parameter. Try α=25.
+What is the ID of the top school with regularization?
+Note that the school IDs are given in the form "PS x" - where x is a number. Report the number only.
+Answer:
+Code:
+ 
+What is the regularized score of the 10th school?
+Answer:
+Code:
+  
+##Q6:Notice that this improves things a bit. The number of small schools that are not highly ranked is now lower. Is there a better  α ?
+Using values of  α  from 10 to 250, find the  α  that minimizes the RMSE.
+RMSE=sqrt(11000∑i=11000(quality−estimate)^2)
+What value of  α  gives the minimum RMSE?
+Answer:
+Code:
+  
+##Q7:Rank the schools based on the average obtained with the best  α .
+Note that no small school is incorrectly included.
+What is the ID of the top school now?
+Note that the school IDs are given in the form "PS x" - where x is a number.
+Report the number only.
+Answer:
+Code: 
+
+What is the regularized average score of the 10th school now?
+Answer:
+Code:
+  
+##Q8:A common mistake made when using regularization is shrinking values towards 0 that are not centered around 0.
+For example, if we don't subtract the overall average before shrinking, we actually obtain a very similar result.
+Confirm this by re-running the code from the exercise in Q6 but without removing the overall mean.
+What value of  α  gives the minimum RMSE here?
+Answer:
+Code:
+  
+
+###Assessments on edX
+###Section 6.3: Regularization (Part 2)
+
+In this exercise set, we will be covering a topic useful for understanding matrix factorization: the singular value decomposition (SVD).
+SVD is a mathematical result that is widely used in machine learning, both in practice and to understand the mathematical properties of some algorithms.
+This is a rather advanced topic and to complete this exercise set you will have to be familiar with linear algebra concepts such as matrix multiplication, orthogonal matrices, and diagonal matrices.
+
+The SVD tells us that we can decompose an  N×p  matrix  Y  with  p<N  as 
+Y=UDV⊤ 
+with  U  and  V  orthogonal of dimensions  N×p  and  p×p  respectively and  D  a  p×p  diagonal matrix with the values of the diagonal decreasing: 
+
+d1,1≥d2,2≥…dp,p 
+In this exercise, we will see one of the ways that this decomposition can be useful.
+To do this, we will construct a dataset that represents grade scores for 100 students in 24 different subjects.
+The overall average has been removed so this data represents the percentage point each student received above or below the average test score.
+So a 0 represents an average grade (C), a 25 is a high grade (A+), and a -25 represents a low grade (F). You can simulate the data like this:
+
+set.seed(1987, sample.kind="Rounding")
+n <- 100
+k <- 8
+Sigma <- 64  * matrix(c(1, .75, .5, .75, 1, .5, .5, .5, 1), 3, 3) 
+m <- MASS::mvrnorm(n, rep(0, 3), Sigma)
+m <- m[order(rowMeans(m), decreasing = TRUE),]
+y <- m %x% matrix(rep(1, k), nrow = 1) + matrix(rnorm(matrix(n*k*3)), n, k*3)
+colnames(y) <- c(paste(rep("Math",k), 1:k, sep="_"),
+                 paste(rep("Science",k), 1:k, sep="_"),
+                 paste(rep("Arts",k), 1:k, sep="_"))
+
+Our goal is to describe the student performances as succinctly as possible.
+For example, we want to know if these test results are all just a random independent numbers. Are all students just about as good?
+Does being good in one subject  imply you will be good in another? How does the SVD help with all this?
+We will go step by step to show that with just three relatively small pairs of vectors we can explain much of the variability in this  100×24  dataset.  
+  
+##Q1:You can visualize the 24 test scores for the 100 students by plotting an image:
+my_image <- function(x, zlim = range(x), ...){
+	colors = rev(RColorBrewer::brewer.pal(9, "RdBu"))
+	cols <- 1:ncol(x)
+	rows <- 1:nrow(x)
+	image(cols, rows, t(x[rev(rows),,drop=FALSE]), xaxt = "n", yaxt = "n",
+			xlab="", ylab="",  col = colors, zlim = zlim, ...)
+	abline(h=rows + 0.5, v = cols + 0.5)
+	axis(side = 1, cols, colnames(x), las = 2)
+}
+my_image(y)
+    
+How would you describe the data based on this figure?
+(a)The test scores are all independent of each other.
+(b)The students that are good at math are not good at science.
+(c)The students that are good at math are not good at arts.
+(d)The students that test well are at the top of the image and there seem to be three groupings by subject.
+(e)The students that test well are at the bottom of the image and there seem to be three groupings by subject.
+Answer:
+Code:
+  
+##Q2:You can examine the correlation between the test scores directly like this:
+my_image(cor(y), zlim = c(-1,1))
+range(cor(y))
+axis(side = 2, 1:ncol(y), rev(colnames(y)), las = 2)
+    
+Which of the following best describes what you see?
+(a)The test scores are independent.
+(b)Test scores in math and science are highly correlated but scores in arts are not.
+(c)There is high correlation between tests in the same subject but no correlation across subjects.
+(d)There is correlation among all tests, but higher if the tests are in science and math and even higher within each subject.
+Answer:
+Code:
+  
+Q3:Remember that orthogonality means that  U⊤U  and  V⊤V  are equal to the identity matrix.
+This implies that we can also rewrite the decomposition as
+YV=UD or U⊤Y=DV⊤ 
+We can think of  YV  and  U⊤V  as two transformations of  Y  that preserve the total variability of  Y  since  U  and  V  are orthogonal.
+
+Use the function svd() to compute the SVD of y. This function will return  U ,  V , and the diagonal entries of  D .
+s <- svd(y)
+names(s)
+    
+You can check that the SVD works by typing:
+y_svd <- s$u %*% diag(s$d) %*% t(s$v)
+max(abs(y - y_svd))
+    
+Compute the sum of squares of the columns of  Y  and store them in ss_y.
+Then compute the sum of squares of columns of the transformed  YV  and store them in ss_yv.
+Confirm that sum(ss_y) is equal to sum(ss_yv).
+
+What is the value of sum(ss_y) (and also the value of sum(ss_yv))?
+Answer:
+Code:
+  
+##Q4:We see that the total sum of squares is preserved. This is because  V  is orthogonal.
+Now to start understanding how  YV  is useful, plot ss_y against the column number and then do the same for ss_yv.
+What do you observe?
+(a)ss_y and ss_yv are decreasing and close to 0 for the 4th column and beyond.
+(b)ss_yv is decreasing and close to 0 for the 4th column and beyond.
+(c)ss_y is decreasing and close to 0 for the 4th column and beyond.
+(d)There is no discernible pattern to either ss_y or ss_yv.
+Answer:
+Code:
+  
+##Q5:Now notice that we didn't have to compute ss_yv because we already have the answer.
+How? Remember that  YV=UD  and because  U  is orthogonal, we know that the sum of squares of the columns of  UD  are the diagonal entries of  D  squared.
+Confirm this by plotting the square root of ss_yv versus the diagonal entries of  D .
+Which of these plots is correct?
+Answer:
+Code:
+  
+##Q6:So from the above we know that the sum of squares of the columns of  Y  (the total sum of squares) adds up to the sum of s$d^2
+and that the transformation  YV  gives us columns with sums of squares equal to s$d^2.
+Now compute the percent of the total variability that is explained by just the first three columns of  YV .
+What proportion of the total variability is explained by the first three columns of  YV ?
+Enter a decimal, not the percentage.
+Answer:
+Code:
+  
+##Q7:Before we continue, let's show a useful computational trick to avoid creating the matrix diag(s$d).
+To motivate this, we note that if we write  U  out in its columns  [U1,U2,…,Up]  then  UD  is equal to
+UD=[U1d1,1,U2d2,2,…,Updp,p] 
+
+Use the sweep function to compute  UD  without constructing diag(s$d) or using matrix multiplication.
+Which code is correct?
+(a)identical(t(s$u %*% diag(s$d)), sweep(s$u, 2, s$d, FUN = "*"))
+(b)identical(s$u %*% diag(s$d), sweep(s$u, 2, s$d, FUN = "*"))
+(c)identical(s$u %*% t(diag(s$d)), sweep(s$u, 2, s$d, FUN = "*"))
+(d)identical(s$u %*% diag(s$d), sweep(s$u, 2, s, FUN = "*"))
+Answer:
+Code:
+  
+##Q8:We know that  U1d1,1 , the first column of  UD , has the most variability of all the columns of  UD .
+Earlier we looked at an image of  Y  using my_image(y), in which we saw that the student to student variability is quite large
+and that students that are good in one subject tend to be good in all.
+This implies that the average (across all subjects) for each student should explain a lot of the variability.
+Compute the average score for each student, plot it against  U1d1,1 , and describe what you find.
+
+What do you observe?
+(a)There is no relationship between the average score for each student and  U1d1,1 .
+(b)There is a linearly decreasing relationship between the average score for each student and  U1d1,1 .
+(c)There is a linearly increasing relationship between the average score for each student and  U1d1,1 .
+(d)There is an exponentially increasing relationship between the average score for each student and  U1d1,1 .
+(e)There is an exponentially decreasing relationship between the average score for each student and  U1d1,1 .
+Answer:
+Code:
+
+##Q9:We note that the signs in SVD are arbitrary because:
+UDV⊤=(−U)D(−V)⊤ 
+With this in mind we see that the first column of  UD  is almost identical to the average score for each student except for the sign.
+
+This implies that multiplying  Y  by the first column of  V  must be performing a similar operation to taking the average.
+Make an image plot of  V  and describe the first column relative to others and how this relates to taking an average.
+
+How does the first column relate to the others, and how does this relate to taking an average?
+(a)The first column is very variable, which implies that the first column of YV is the sum of the rows of Y
+multiplied by some non-constant function, and is thus not proportional to an average.
+(b)The first column is very variable, which implies that the first column of YV is the sum of the rows of Y
+multiplied by some non-constant function, and is thus proportional to an average.
+(c)The first column is very close to being a constant, which implies that the first column of YV
+is the sum of the rows of Y multiplied by some constant, and is thus proportional to an average.
+(d)The first three columns are all very close to being a constant,
+which implies that these columns are the sum of the rows of Y multiplied by some constant, and are thus proportional to an average.
+Answer:
+Code:
+
+
+The following four exercises are all ungraded and are provided to give you an additional opportunity to
+practice working with matrices in a continuation of the exercises with this dataset.
+We recommend that you attempt to write the code on your own before hitting "submit" and viewing the answers.   
+    
+##Q10:We already saw that we can rewrite  UD  as
+U1d1,1+U2d2,2+⋯+Updp,p 
+with  Uj  the j-th column of  U . This implies that we can rewrite the entire SVD as:
+Y=U1d1,1V⊤1+U2d2,2V⊤2+⋯+Updp,pV⊤p 
+with  Vj  the jth column of  V .
+
+Plot  U1 , then plot  V⊤1  using the same range for the y-axis limits, then make an image of  U1d1,1V⊤1  and compare it to the image of  Y .
+Hint: use the my_image() function defined above.
+Use the drop=FALSE argument to assure the subsets of matrices are matrices.
+Answer:
+Code:
+  
+##Q11:We see that with just a vector of length 100, a scalar, and a vector of length 24, we can actually come close to reconstructing the a  100×24  matrix. This is our first matrix factorization:
+Y≈d1,1U1V⊤1 
+In the exercise in Q6, we saw how to calculate the percent of total variability explained. However, our approximation only explains the observation that good students tend to be good in all subjects.
+Another aspect of the original data that our approximation does not explain was the higher similarity we observed within subjects.
+We can see this by computing the difference between our approximation and original data and then computing the correlations. You can see this by running this code:
+resid <- y - with(s,(u[, 1, drop=FALSE]*d[1]) %*% t(v[, 1, drop=FALSE]))
+my_image(cor(resid), zlim = c(-1,1))
+axis(side = 2, 1:ncol(y), rev(colnames(y)), las = 2)
+
+Now that we have removed the overall student effect, the correlation plot reveals that we have not yet explained the within subject correlation
+nor the fact that math and science are closer to each other than to the arts.
+So let's explore the second column of the SVD.
+Repeat the previous exercise (Q10) but for the second column: Plot  U2 , then plot  V⊤2  using the same range for the y-axis limits,
+then make an image of  U2d2,2V⊤2  and compare it to the image of resid.
+Answer:
+Code:
+  
+##Q12:The second column clearly relates to a student's difference in ability in math/science versus the arts.
+We can see this most clearly from the plot of s$v[,2]. Adding the matrix we obtain with these two columns will help with our approximation:
+Y≈d1,1U1V⊤1+d2,2U2V⊤2 
+We know it will explain sum(s$d[1:2]^2)/sum(s$d^2) * 100 percent of the total variability. We can compute new residuals like this:
+resid <- y - with(s,sweep(u[, 1:2], 2, d[1:2], FUN="*") %*% t(v[, 1:2]))
+my_image(cor(resid), zlim = c(-1,1))
+axis(side = 2, 1:ncol(y), rev(colnames(y)), las = 2)
+and see that the structure that is left is driven by the differences between math and science. Confirm this by first plotting  U3 ,
+then plotting  V⊤3  using the same range for the y-axis limits, then making an image of  U3d3,3V⊤3  and comparing it to the image of resid
+Answer:
+Code:
+
+##Q13:The third column clearly relates to a student's difference in ability in math and science. We can see this most clearly from the plot of s$v[,3].
+Adding the matrix we obtain with these two columns will help with our approximation:
+Y≈d1,1U1V⊤1+d2,2U2V⊤2+d3,3U3V⊤3 
+We know it will explain: sum(s$d[1:3]^2)/sum(s$d^2) * 100 percent of the total variability. We can compute new residuals like this:
+resid <- y - with(s,sweep(u[, 1:3], 2, d[1:3], FUN="*") %*% t(v[, 1:3]))
+my_image(cor(resid), zlim = c(-1,1))
+axis(side = 2, 1:ncol(y), rev(colnames(y)), las = 2)
+
+We no longer see structure in the residuals: they seem to be independent of each other.
+This implies that we can describe the data with the following model:
+
+Y=d1,1U1V⊤1+d2,2U2V⊤2+d3,3U3V⊤3+ε 
+with  ε  a matrix of independent identically distributed errors.
+This model is useful because we summarize of  100×24  observations with  3×(100+24+1)=375  numbers.
+
+Furthermore, the three components of the model have useful interpretations:
+1 - the overall ability of a student
+2 - the difference in ability between the math/sciences and arts
+3 - the remaining differences between the three subjects.
+The sizes  d1,1,d2,2  and  d3,3  tell us the variability explained by each component. Finally, note that the components  dj,jUjV⊤j  are equivalent to the jth principal component.
+Finish the exercise by plotting an image of  Y , an image of  d1,1U1V⊤1+d2,2U2V⊤2+d3,3U3V⊤3  and an image of the residuals, all with the same zlim.
+Answer:
+Code:
+
+
+###Assessments on edX
+###Section 6.3: Regularization (Part 3)
+  
+##Q1:We want to explore the tissue_gene_expression predictors by plotting them.
+data("tissue_gene_expression")
+dim(tissue_gene_expression$x)
+We want to get an idea of which observations are close to each other, but, as you can see from the dimensions, the predictors are 500-dimensional, making plotting difficult.
+Plot the first two principal components with color representing tissue type.
+Which tissue is in a cluster by itself?
+cerebellum; colon; endometrium; hippocampus; kidney; liver; placenta
+Answer:
+Code:
+  
+##Q2:The predictors for each observation are measured using the same device and experimental procedure.
+This introduces biases that can affect all the predictors from one observation.
+For each observation, compute the average across all predictors, and then plot this against the first PC with color representing tissue.
+Report the correlation.
+What is the correlation?
+Answer:
+Code:
+  
+##Q3:We see an association with the first PC and the observation averages. Redo the PCA but only after removing the center.
+Part of the code is provided for you.
+
+#BLANK
+pc <- prcomp(x)
+data.frame(pc_1 = pc$x[,1], pc_2 = pc$x[,2], 
+           tissue = tissue_gene_expression$y) %>%
+  ggplot(aes(pc_1, pc_2, color = tissue)) +
+  geom_point()
+
+Which line of code should be used to replace #BLANK in the code block above?
+(a)x <- with(tissue_gene_expression, sweep(x, 1, mean(x)))
+(b)x <- sweep(x, 1, rowMeans(tissue_gene_expression$x))
+(c)x <- tissue_gene_expression$x - mean(tissue_gene_expression$x)
+(d)x <- with(tissue_gene_expression, sweep(x, 1, rowMeans(x)))
+Answer:
+Code:
+  
+##Q4:For the first 10 PCs, make a boxplot showing the values for each tissue.
+For the 7th PC, which two tissues have the greatest median difference?
+Select the TWO tissues that have the greatest median difference.
+cerebellum; colon; endometrium; hippocampus; kidney; liver; placenta
+Answer:
+Code:
+  
+##Q5:Plot the percent variance explained by PC number. Hint: use the summary function.
+How many PCs are required to reach a cumulative percent variance explained greater than 50%?
+Answer:
+Code:
+
+
+###Assessments on edX
+###Section 6.3: Regularization (Part 4)
+      
+##Q1:Load the tissue_gene_expression dataset. Remove the row means and compute the distance between each observation. Store the result in d.
+Which of the following lines of code correctly does this computation?
+(a)d <- dist(tissue_gene_expression$x)
+(b)d <- dist(rowMeans(tissue_gene_expression$x))
+(c)d <- dist(rowMeans(tissue_gene_expression$y))
+(d)d <- dist(tissue_gene_expression$x - rowMeans(tissue_gene_expression$x))
+Answer:
+Code:
+  
+##Q2:Make a hierarchical clustering plot and add the tissue types as labels.
+You will observe multiple branches.
+Which tissue type is in the branch farthest to the left?
+cerebellum; colon; endometrium; hippocampus; kidney; liver; placenta
+Answer:
+Code:
+  
+##Q3:Select the 50 most variable genes. Make sure the observations show up in the columns, that the predictor are centered, and add a color bar to show the different tissue types.
+Hint: use the ColSideColors argument to assign colors. Also, use col = RColorBrewer::brewer.pal(11, "RdBu") for a better use of colors.
+Part of the code is provided for you here:
+library(RColorBrewer)
+sds <- matrixStats::colSds(tissue_gene_expression$x)
+ind <- order(sds, decreasing = TRUE)[1:50]
+colors <- brewer.pal(7, "Dark2")[as.numeric(tissue_gene_expression$y)]
+#BLANK
+
+Which line of code should replace #BLANK in the code above?
+(a)heatmap(t(tissue_gene_expression$x[,ind]), col = brewer.pal(11, "RdBu"), scale = "row", ColSideColors = colors)
+(b)heatmap(t(tissue_gene_expression$x[,ind]), col = brewer.pal(11, "RdBu"), scale = "row", ColSideColors = rev(colors))
+(c)heatmap(t(tissue_gene_expression$x[,ind]), col = brewer.pal(11, "RdBu"), scale = "row", ColSideColors = sample(colors))
+(d)heatmap(t(tissue_gene_expression$x[,ind]), col = brewer.pal(11, "RdBu"), scale = "row", ColSideColors = sample(colors))
+Answer:
+Code:
+
+
+
+ 
+###Assessments on edX
+###Section 
+
 
 Q1:
 Answer:
 Code:
-
+  
 Q2:
 Answer:
 Code:
-
+  
 Q3:
 Answer:
 Code:
-
+  
 Q4:
 Answer:
 Code:
-
+  
 Q5:
 Answer:
 Code:
-
+  
 Q6:
 Answer:
 Code:
-
+  
 Q7:
 Answer:
 Code:
-
+  
 Q8:
 Answer:
 Code:
-
-
