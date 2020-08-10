@@ -1696,19 +1696,32 @@ data("movielens")
 ##Q1:Compute the number of ratings for each movie and then plot it against the year the movie came out.
 Use the square root transformation on the counts.
 What year has the highest median number of ratings?
-Answer:
+Answer:1995
 Code:
-
+movielens %>% group_by(movieId) %>%
+  summarize(n = n(), year = as.character(first(year))) %>%
+  qplot(year, n, data = ., geom = "boxplot") +
+  coord_trans(y = "sqrt") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+  
 ##Q2:We see that, on average, movies that came out after 1993 get more ratings.
 We also see that with newer movies, starting in 1993, the number of ratings decreases with year: the more recent a movie is, the less time users have had to rate it.
 Among movies that came out in 1993 or later, select the top 25 movies with the highest average number of ratings per year (n/year), and caculate the average rating of each of them.
 To calculate number of ratings per year, use 2018 as the end year.
 What is the average rating for the movie The Shawshank Redemption?
-Answer: 
-Code:
+Answer:4.49
 What is the average number of ratings per year for the movie Forrest Gump?
-Answer:
+Answer:14.2
 Code:
+movielens %>% 
+  filter(year >= 1993) %>%
+  group_by(movieId) %>%
+  summarize(n = n(), years = 2018 - first(year),
+            title = title[1],
+            rating = mean(rating)) %>%
+  mutate(rate = n/years) %>%
+  top_n(25, rate) %>%
+  arrange(desc(rate))
 
 ##Q3:From the table constructed in Q2, we can see that the most frequently rated movies tend to have above average ratings.
 This is not surprising: more people watch popular movies.
@@ -1719,8 +1732,18 @@ What type of trend do you observe?
 (b)Movies with very few and very many ratings have the highest average ratings.
 (c)The more often a movie is rated, the higher its average rating.
 (d)The more often a movie is rated, the lower its average rating
-Answer:
+Answer:(c)
 Code:
+movielens %>% 
+  filter(year >= 1993) %>%
+  group_by(movieId) %>%
+  summarize(n = n(), years = 2018 - first(year),
+            title = title[1],
+            rating = mean(rating)) %>%
+  mutate(rate = n/years) %>%
+  ggplot(aes(rate, rating)) +
+  geom_point() +
+  geom_smooth()
 
 ##Q4:Suppose you are doing a predictive analysis in which you need to fill in the missing ratings with some value.
 Given your observations in the exercise in Q3, which of the following strategies would be most appropriate?
@@ -1729,8 +1752,10 @@ Given your observations in the exercise in Q3, which of the following strategies
 (c)Fill in the missing values with a lower value than the average rating across all movies.
 (d)Fill in the value with a higher value than the average rating across all movies.
 (e)None of the above
-Answer:
-Code:
+Answer:(c)
+Explanation:
+Because a lack of ratings is associated with lower ratings, it would be most appropriate to fill in the missing value with a lower value than the average.
+You should try out different values to fill in the missing value and evaluate prediction in a test set.
 
 ##Q5:The movielens dataset also includes a time stamp.
 This variable represents the time and data in which the rating was provided.
@@ -1740,8 +1765,9 @@ Which code correctly creates this new column?
 (b)movielens <- mutate(movielens, date = as_datetime(timestamp))
 (c)movielens <- mutate(movielens, date = as.data(timestamp))
 (d)movielens <- mutate(movielens, date = timestamp)
-Answer:
-Code:
+Answer:(b)
+Explanation:
+The as_datetime function in the lubridate package is particularly useful here.
   
 ##Q6:Compute the average rating for each week and plot this average against date.
 Hint: use the round_date() function before you group_by().
@@ -1749,17 +1775,22 @@ What type of trend do you observe?
 (a)There is very strong evidence of a time effect on average rating.
 (b)There is some evidence of a time effect on average rating.
 (c)There is no evidence of a time effect on average rating (straight horizontal line).
-Answer:
+Answer:(b)
 Code:
-  
+movielens %>% mutate(date = round_date(date, unit = "week")) %>%
+  group_by(date) %>%
+  summarize(rating = mean(rating)) %>%
+  ggplot(aes(date, rating)) +
+  geom_point() +
+  geom_smooth() 
+
 ##Q7:Consider again the plot you generated in Q6.
 If we define  du,i  as the day for user's  u  rating of movie  i , which of the following models is most appropriate?
 (a)Yu,i=μ+bi+bu+du,i+εu,i 
 (b)Yu,i=μ+bi+bu+du,iβ+εu,i 
 (c)Yu,i=μ+bi+bu+du,iβi+εu,i 
 (d)Yu,i=μ+bi+bu+f(du,i)+εu,i , with  f  a smooth function of  du,i
-Answer:
-Code:
+Answer:(d)
   
 ##Q8:The movielens data also has a genres column.
 This column includes every genre that applies to the movie.
@@ -1768,8 +1799,16 @@ Then compute the average and standard error for each category.
 Plot these as error bar plots.
 Which genre has the lowest average rating?
 Enter the name of the genre exactly as reported in the plot, including capitalization and punctuation.
-Answer:
+Answer:Comedy
 Code:
+movielens %>% group_by(genres) %>%
+	summarize(n = n(), avg = mean(rating), se = sd(rating)/sqrt(n())) %>%
+	filter(n >= 1000) %>% 
+	mutate(genres = reorder(genres, avg)) %>%
+	ggplot(aes(x = genres, y = avg, ymin = avg - 2*se, ymax = avg + 2*se)) + 
+	geom_point() +
+	geom_errorbar() + 
+	theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
 ##Q9:The plot you generated in Q8 shows strong evidence of a genre effect. Consider this plot as you answer the following question.
 If we define  gu,i  as the genre for user  u 's rating of movie  i , which of the following models is most appropriate?
@@ -1777,8 +1816,7 @@ If we define  gu,i  as the genre for user  u 's rating of movie  i , which of th
 (b)Yu,i=μ+bi+bu+gu,iβ+εu,i 
 (c)Yu,i=μ+bi+bu+∑Kk=1xku,iβk+εu,i , with  xku,i=1  if  gu,i  is genre  k 
 (d)Yu,i=μ+bi+bu+f(gu,i)+εu,i , with  f  a smooth function of  gu,i
-Answer:
-Code:
+Answer:(c)
   
   
 ###Assessments on edX
