@@ -1610,7 +1610,7 @@ You may need to install some packages. Keep in mind that you will probably get s
 Run the following code to train the various models:
 library(caret)
 library(dslabs)
-set.seed(1) # use `set.seed(1, sample.kind = "Rounding")` in R 3.6 or later
+set.seed(1, sample.kind = "Rounding")
 data("mnist_27")
 
 fits <- lapply(models, function(model){ 
@@ -1626,9 +1626,12 @@ Answer:Yes
 ##Q2:Now that you have all the trained models in a list, use sapply() or map() to create a matrix of predictions for the test set.
 You should end up with a matrix with length(mnist_27$test$y) rows and length(models) columns.
 What are the dimensions of the matrix of predictions?
-Number of rows:
-Number of columns:
+Number of rows:200
+Number of columns:10
 Code:
+pred <- sapply(fits, function(object) 
+	predict(object, newdata = mnist_27$test))
+dim(pred)
 
 ##Q3:Now compute accuracy for each model on the test set.
 Report the mean accuracy across all models.
