@@ -1635,25 +1635,33 @@ dim(pred)
 
 ##Q3:Now compute accuracy for each model on the test set.
 Report the mean accuracy across all models.
-Answer:
+Answer:0.789
 Code:
+acc <- colMeans(pred == mnist_27$test$y)
+acc
+mean(acc)
 
 ##Q4:Next, build an ensemble prediction by majority vote and compute the accuracy of the ensemble.
 Vote 7 if more than 50% of the models are predicting a 7, and 2 otherwise.
 What is the accuracy of the ensemble?
-Answer:
+Answer:0.815
 Code:
+votes <- rowMeans(pred == "7")
+y_hat <- ifelse(votes > 0.5, "7", "2")
+mean(y_hat == mnist_27$test$y)
 
 ##Q5:In Q3, we computed the accuracy of each method on the test set and noticed that the individual accuracies varied.
 How many of the individual methods do better than the ensemble?
-Answer:
-Code:
+Answer:3
 
 Which individual methods perform better than the ensemble?
 Select ALL that apply.
 glm; lda; naive_bayes; svmLinear; knn; gamLoess; multinom; qda; rf; adaboost
-Answer:
+Answer:knn, gamLoess, and qda
 Code:
+ind <- acc > mean(y_hat == mnist_27$test$y)
+sum(ind)
+models[ind]
 
 ##Q6:It is tempting to remove the methods that do not perform well and re-do the ensemble.
 The problem with this approach is that we are using the test data to make a decision.
@@ -1661,15 +1669,19 @@ However, we could use the minimum accuracy estimates obtained from cross validat
 Obtain these estimates and save them in an object.
 Report the mean of these training set accuracy estimates.
 What is the mean of these training set accuracy estimates?
-Answer:
+Answer:0.809
 Code:
+acc_hat <- sapply(fits, function(fit) min(fit$results$Accuracy))
+mean(acc_hat)
 
 ##Q7:Now let's only consider the methods with an estimated accuracy of greater than or equal to 0.8 when constructing the ensemble. Vote 7 if 50% or more of the models are predicting a 7, and 2 otherwise.
 What is the accuracy of the ensemble now?
-Answer:
+Answer:0.825
 Code:
-
-
+ind <- acc_hat >= 0.8
+votes <- rowMeans(pred[,ind] == "7")
+y_hat <- ifelse(votes>=0.5, 7, 2)
+mean(y_hat == mnist_27$test$y)
 
 
 ###Assessments on edX
