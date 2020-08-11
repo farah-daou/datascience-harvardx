@@ -2021,8 +2021,7 @@ How would you describe the data based on this figure?
 (c)The students that are good at math are not good at arts.
 (d)The students that test well are at the top of the image and there seem to be three groupings by subject.
 (e)The students that test well are at the bottom of the image and there seem to be three groupings by subject.
-Answer:
-Code:
+Answer:(d)
   
 ##Q2:You can examine the correlation between the test scores directly like this:
 my_image(cor(y), zlim = c(-1,1))
@@ -2034,8 +2033,7 @@ Which of the following best describes what you see?
 (b)Test scores in math and science are highly correlated but scores in arts are not.
 (c)There is high correlation between tests in the same subject but no correlation across subjects.
 (d)There is correlation among all tests, but higher if the tests are in science and math and even higher within each subject.
-Answer:
-Code:
+Answer:(d)
   
 Q3:Remember that orthogonality means that  U⊤U  and  V⊤V  are equal to the identity matrix.
 This implies that we can also rewrite the decomposition as
@@ -2055,8 +2053,12 @@ Then compute the sum of squares of columns of the transformed  YV  and store the
 Confirm that sum(ss_y) is equal to sum(ss_yv).
 
 What is the value of sum(ss_y) (and also the value of sum(ss_yv))?
-Answer:
+Answer:175435
 Code:
+ss_y <- apply(y^2, 2, sum)
+ss_yv <- apply((y%*%s$v)^2, 2, sum)
+sum(ss_y)
+sum(ss_yv)
   
 ##Q4:We see that the total sum of squares is preserved. This is because  V  is orthogonal.
 Now to start understanding how  YV  is useful, plot ss_y against the column number and then do the same for ss_yv.
@@ -2065,23 +2067,29 @@ What do you observe?
 (b)ss_yv is decreasing and close to 0 for the 4th column and beyond.
 (c)ss_y is decreasing and close to 0 for the 4th column and beyond.
 (d)There is no discernible pattern to either ss_y or ss_yv.
-Answer:
-Code:
+Answer:(b)
+Explanation:The plots can be made using plot(ss_y) and plot(ss_yv). We see that the variability of the columns of  YV  is decreasing.
+Furthermore, we see that, relative to the first three, the variability of the columns beyond the third is almost 0.
   
 ##Q5:Now notice that we didn't have to compute ss_yv because we already have the answer.
 How? Remember that  YV=UD  and because  U  is orthogonal, we know that the sum of squares of the columns of  UD  are the diagonal entries of  D  squared.
 Confirm this by plotting the square root of ss_yv versus the diagonal entries of  D .
 Which of these plots is correct?
-Answer:
+Answer:(a)
 Code:
+data.frame(x = sqrt(ss_yv), y = s$d) %>%
+  ggplot(aes(x,y)) +
+  geom_point()
   
 ##Q6:So from the above we know that the sum of squares of the columns of  Y  (the total sum of squares) adds up to the sum of s$d^2
 and that the transformation  YV  gives us columns with sums of squares equal to s$d^2.
 Now compute the percent of the total variability that is explained by just the first three columns of  YV .
 What proportion of the total variability is explained by the first three columns of  YV ?
 Enter a decimal, not the percentage.
-Answer:
-Code:
+Answer:0.988
+Explanation:The total variability explained can be calculated using the following code: sum(s$d[1:3]^2) / sum(s$d^2).
+We see that almost 99% of the variability is explained by the first three columns of  YV=UD .
+So we get the sense that we should be able to explain much of the variability and structure we found while exploring the data with a few columns.
   
 ##Q7:Before we continue, let's show a useful computational trick to avoid creating the matrix diag(s$d).
 To motivate this, we note that if we write  U  out in its columns  [U1,U2,…,Up]  then  UD  is equal to
@@ -2093,8 +2101,7 @@ Which code is correct?
 (b)identical(s$u %*% diag(s$d), sweep(s$u, 2, s$d, FUN = "*"))
 (c)identical(s$u %*% t(diag(s$d)), sweep(s$u, 2, s$d, FUN = "*"))
 (d)identical(s$u %*% diag(s$d), sweep(s$u, 2, s, FUN = "*"))
-Answer:
-Code:
+Answer:(b)
   
 ##Q8:We know that  U1d1,1 , the first column of  UD , has the most variability of all the columns of  UD .
 Earlier we looked at an image of  Y  using my_image(y), in which we saw that the student to student variability is quite large
@@ -2108,8 +2115,8 @@ What do you observe?
 (c)There is a linearly increasing relationship between the average score for each student and  U1d1,1 .
 (d)There is an exponentially increasing relationship between the average score for each student and  U1d1,1 .
 (e)There is an exponentially decreasing relationship between the average score for each student and  U1d1,1 .
-Answer:
-Code:
+Answer:(c)
+Explanation:You can generate the plot using plot(-s$u[,1]*s$d[1], rowMeans(y))
 
 ##Q9:We note that the signs in SVD are arbitrary because:
 UDV⊤=(−U)D(−V)⊤ 
@@ -2127,8 +2134,8 @@ multiplied by some non-constant function, and is thus proportional to an average
 is the sum of the rows of Y multiplied by some constant, and is thus proportional to an average.
 (d)The first three columns are all very close to being a constant,
 which implies that these columns are the sum of the rows of Y multiplied by some constant, and are thus proportional to an average.
-Answer:
-Code:
+Answer:(c)
+Explanation:The image plot can be made using my_image(s$v)
 
 
 The following four exercises are all ungraded and are provided to give you an additional opportunity to
@@ -2144,8 +2151,12 @@ with  Vj  the jth column of  V .
 Plot  U1 , then plot  V⊤1  using the same range for the y-axis limits, then make an image of  U1d1,1V⊤1  and compare it to the image of  Y .
 Hint: use the my_image() function defined above.
 Use the drop=FALSE argument to assure the subsets of matrices are matrices.
-Answer:
+Answer:XXXX
 Code:
+plot(s$u[,1], ylim = c(-0.25, 0.25))
+plot(s$v[,1], ylim = c(-0.25, 0.25))
+with(s, my_image((u[, 1, drop=FALSE]*d[1]) %*% t(v[, 1, drop=FALSE])))
+my_image(y)
   
 ##Q11:We see that with just a vector of length 100, a scalar, and a vector of length 24, we can actually come close to reconstructing the a  100×24  matrix. This is our first matrix factorization:
 Y≈d1,1U1V⊤1 
@@ -2161,8 +2172,12 @@ nor the fact that math and science are closer to each other than to the arts.
 So let's explore the second column of the SVD.
 Repeat the previous exercise (Q10) but for the second column: Plot  U2 , then plot  V⊤2  using the same range for the y-axis limits,
 then make an image of  U2d2,2V⊤2  and compare it to the image of resid.
-Answer:
+Answer:XXXX
 Code:
+plot(s$u[,2], ylim = c(-0.5, 0.5))
+plot(s$v[,2], ylim = c(-0.5, 0.5))
+with(s, my_image((u[, 2, drop=FALSE]*d[2]) %*% t(v[, 2, drop=FALSE])))
+my_image(resid)
   
 ##Q12:The second column clearly relates to a student's difference in ability in math/science versus the arts.
 We can see this most clearly from the plot of s$v[,2]. Adding the matrix we obtain with these two columns will help with our approximation:
@@ -2173,8 +2188,12 @@ my_image(cor(resid), zlim = c(-1,1))
 axis(side = 2, 1:ncol(y), rev(colnames(y)), las = 2)
 and see that the structure that is left is driven by the differences between math and science. Confirm this by first plotting  U3 ,
 then plotting  V⊤3  using the same range for the y-axis limits, then making an image of  U3d3,3V⊤3  and comparing it to the image of resid
-Answer:
+Answer:XXXX
 Code:
+plot(s$u[,3], ylim = c(-0.5, 0.5))
+plot(s$v[,3], ylim = c(-0.5, 0.5))
+with(s, my_image((u[, 3, drop=FALSE]*d[3]) %*% t(v[, 3, drop=FALSE])))
+my_image(resid)
 
 ##Q13:The third column clearly relates to a student's difference in ability in math and science. We can see this most clearly from the plot of s$v[,3].
 Adding the matrix we obtain with these two columns will help with our approximation:
@@ -2197,8 +2216,12 @@ Furthermore, the three components of the model have useful interpretations:
 3 - the remaining differences between the three subjects.
 The sizes  d1,1,d2,2  and  d3,3  tell us the variability explained by each component. Finally, note that the components  dj,jUjV⊤j  are equivalent to the jth principal component.
 Finish the exercise by plotting an image of  Y , an image of  d1,1U1V⊤1+d2,2U2V⊤2+d3,3U3V⊤3  and an image of the residuals, all with the same zlim.
-Answer:
+Answer:XXXX
 Code:
+y_hat <- with(s,sweep(u[, 1:3], 2, d[1:3], FUN="*") %*% t(v[, 1:3]))
+my_image(y, zlim = range(y))
+my_image(y_hat, zlim = range(y))
+my_image(y - y_hat, zlim = range(y))
 
 
 ###Assessments on edX
@@ -2211,16 +2234,27 @@ We want to get an idea of which observations are close to each other, but, as yo
 Plot the first two principal components with color representing tissue type.
 Which tissue is in a cluster by itself?
 cerebellum; colon; endometrium; hippocampus; kidney; liver; placenta
-Answer:
+Answer:liver
 Code:
+pc <- prcomp(tissue_gene_expression$x)
+data.frame(pc_1 = pc$x[,1], pc_2 = pc$x[,2], 
+           tissue = tissue_gene_expression$y) %>%
+  ggplot(aes(pc_1, pc_2, color = tissue)) +
+  geom_point()
   
 ##Q2:The predictors for each observation are measured using the same device and experimental procedure.
 This introduces biases that can affect all the predictors from one observation.
 For each observation, compute the average across all predictors, and then plot this against the first PC with color representing tissue.
 Report the correlation.
 What is the correlation?
-Answer:
+Answer:0.597
 Code:
+avgs <- rowMeans(tissue_gene_expression$x)
+data.frame(pc_1 = pc$x[,1], avg = avgs, 
+           tissue = tissue_gene_expression$y) %>%
+ggplot(aes(avgs, pc_1, color = tissue)) +
+  geom_point()
+cor(avgs, pc$x[,1])
   
 ##Q3:We see an association with the first PC and the observation averages. Redo the PCA but only after removing the center.
 Part of the code is provided for you.
@@ -2237,20 +2271,23 @@ Which line of code should be used to replace #BLANK in the code block above?
 (b)x <- sweep(x, 1, rowMeans(tissue_gene_expression$x))
 (c)x <- tissue_gene_expression$x - mean(tissue_gene_expression$x)
 (d)x <- with(tissue_gene_expression, sweep(x, 1, rowMeans(x)))
-Answer:
-Code:
+Answer:(d)
   
 ##Q4:For the first 10 PCs, make a boxplot showing the values for each tissue.
 For the 7th PC, which two tissues have the greatest median difference?
 Select the TWO tissues that have the greatest median difference.
 cerebellum; colon; endometrium; hippocampus; kidney; liver; placenta
-Answer:
+Answer:placenta & colon
 Code:
+for(i in 1:10){
+    boxplot(pc$x[,i] ~ tissue_gene_expression$y, main = paste("PC", i))
+  }
   
 ##Q5:Plot the percent variance explained by PC number. Hint: use the summary function.
 How many PCs are required to reach a cumulative percent variance explained greater than 50%?
-Answer:
+Answer:3
 Code:
+plot(summary(pc)$importance[3,])
 
 
 ###Assessments on edX
@@ -2262,15 +2299,16 @@ Which of the following lines of code correctly does this computation?
 (b)d <- dist(rowMeans(tissue_gene_expression$x))
 (c)d <- dist(rowMeans(tissue_gene_expression$y))
 (d)d <- dist(tissue_gene_expression$x - rowMeans(tissue_gene_expression$x))
-Answer:
-Code:
+Answer:(d)
   
 ##Q2:Make a hierarchical clustering plot and add the tissue types as labels.
 You will observe multiple branches.
 Which tissue type is in the branch farthest to the left?
 cerebellum; colon; endometrium; hippocampus; kidney; liver; placenta
-Answer:
+Answer:liver
 Code:
+h <- hclust(d)
+plot(h)
   
 ##Q3:Select the 50 most variable genes. Make sure the observations show up in the columns, that the predictor are centered, and add a color bar to show the different tissue types.
 Hint: use the ColSideColors argument to assign colors. Also, use col = RColorBrewer::brewer.pal(11, "RdBu") for a better use of colors.
@@ -2286,8 +2324,7 @@ Which line of code should replace #BLANK in the code above?
 (b)heatmap(t(tissue_gene_expression$x[,ind]), col = brewer.pal(11, "RdBu"), scale = "row", ColSideColors = rev(colors))
 (c)heatmap(t(tissue_gene_expression$x[,ind]), col = brewer.pal(11, "RdBu"), scale = "row", ColSideColors = sample(colors))
 (d)heatmap(t(tissue_gene_expression$x[,ind]), col = brewer.pal(11, "RdBu"), scale = "row", ColSideColors = sample(colors))
-Answer:
-Code:
+Answer:(a)
 
 
 
