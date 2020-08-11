@@ -1864,29 +1864,31 @@ Report the ID of the top school and average score of the 10th school.
 What is the ID of the top school?
 Note that the school IDs are given in the form "PS x" - where x is a number.
 Report the number only.
-Answer:
-Code:
+Answer:567
 
 What is the average score of the 10th school?
-Answer:
+Answer:87.95
 Code:
+schools %>% top_n(10, score) %>% arrange(desc(score)) %>% select(id, size, score)
   
 ##Q2:Compare the median school size to the median school size of the top 10 schools based on the score.
 What is the median school size overall?
-Answer:
-Code: 
+Answer:261
 
 What is the median school size of the of the top 10 schools based on the score?
-Answer:
+Answer:185.5
 Code:
+median(schools$size)
+schools %>% top_n(10, score) %>% .$size %>% median()
   
 ##Q3:According to this analysis, it appears that small schools produce better test scores than large schools.
 Four out of the top 10 schools have 100 or fewer students.
 But how can this be? We constructed the simulation so that quality and size were independent.
 Repeat the exercise for the worst 10 schools.
 What is the median school size of the bottom 10 schools based on the score?
-Answer:
+Answer:219
 Code:
+schools %>% top_n(-10, score) %>% .$size %>% median() 
   
 ##Q4:From this analysis, we see that the worst schools are also small. Plot the average score versus school size to see what's going on. Highlight the top 10 schools based on the true quality.
 What do you observe?
@@ -1895,8 +1897,15 @@ What do you observe?
 (c)The standard error of the score has smaller variability when the school is smaller, which is why both the best and the worst schools are more likely to be small.
 (d)The standard error of the score has larger variability when the school is very small or very large, which is why both the best and the worst schools are more likely to be small.
 (e)The standard error of the score has smaller variability when the school is very small or very large, which is why both the best and the worst schools are more likely to be small.
-Answer:
+Answer:(b)
 Code:
+schools %>% ggplot(aes(size, score)) +
+  geom_point(alpha = 0.5) +
+  geom_point(data = filter(schools, rank<=10), col = 2)
+
+We can see that the standard error of the score has larger variability when the school is smaller.
+This is a basic statistical reality we learned in PH125.3x: Data Science: Probability and PH125.4x: Data Science: Inference and Modeling courses!
+Note also that several of the top 10 schools based on true quality are also in the top 10 schools based on the exam score: schools %>% top_n(10, score) %>% arrange(desc(score)).
   
 ##Q5:Let's use regularization to pick the best schools. Remember regularization shrinks deviations from the average towards 0.
 To apply regularization here, we first need to define the overall average for all schools, using the following code:
@@ -1905,38 +1914,60 @@ Then, we need to define, for each school, how it deviates from that average.
 Write code that estimates the score above the average for each school but dividing by n+α instead of n, with n the school size and α a regularization parameter. Try α=25.
 What is the ID of the top school with regularization?
 Note that the school IDs are given in the form "PS x" - where x is a number. Report the number only.
-Answer:
-Code:
+Answer:191
  
 What is the regularized score of the 10th school?
-Answer:
+Answer:87.15
 Code:
+alpha <- 25
+score_reg <- sapply(scores, function(x)  overall + sum(x-overall)/(length(x)+alpha))
+schools %>% mutate(score_reg = score_reg) %>%
+  top_n(10, score_reg) %>% arrange(desc(score_reg))
   
 ##Q6:Notice that this improves things a bit. The number of small schools that are not highly ranked is now lower. Is there a better  α ?
 Using values of  α  from 10 to 250, find the  α  that minimizes the RMSE.
 RMSE=sqrt(11000∑i=11000(quality−estimate)^2)
 What value of  α  gives the minimum RMSE?
-Answer:
+Answer:135
 Code:
+alphas <- seq(10,250)
+rmse <- sapply(alphas, function(alpha){
+  score_reg <- sapply(scores, function(x) overall+sum(x-overall)/(length(x)+alpha))
+  sqrt(mean((score_reg - schools$quality)^2))
+})
+plot(alphas, rmse)
+alphas[which.min(rmse)]
   
 ##Q7:Rank the schools based on the average obtained with the best  α .
 Note that no small school is incorrectly included.
 What is the ID of the top school now?
 Note that the school IDs are given in the form "PS x" - where x is a number.
 Report the number only.
-Answer:
-Code: 
+Answer:191
 
 What is the regularized average score of the 10th school now?
-Answer:
+Answer:85.4
 Code:
+alpha <- alphas[which.min(rmse)]  
+score_reg <- sapply(scores, function(x)
+  overall+sum(x-overall)/(length(x)+alpha))
+schools %>% mutate(score_reg = score_reg) %>%
+  top_n(10, score_reg) %>% arrange(desc(score_reg))
   
 ##Q8:A common mistake made when using regularization is shrinking values towards 0 that are not centered around 0.
 For example, if we don't subtract the overall average before shrinking, we actually obtain a very similar result.
 Confirm this by re-running the code from the exercise in Q6 but without removing the overall mean.
 What value of  α  gives the minimum RMSE here?
-Answer:
-Code:
+Answer:10
+Code:The code here is nearly the same as in Q6, but we don't subtract the overall mean.
+The value of \( \alpha \) that minimizes the RMSE can be calculated using the following code:
+alphas <- seq(10,250)
+rmse <- sapply(alphas, function(alpha){
+  score_reg <- sapply(scores, function(x) sum(x)/(length(x)+alpha))
+  sqrt(mean((score_reg - schools$quality)^2))
+})
+plot(alphas, rmse)
+alphas[which.min(rmse)]
   
 
 ###Assessments on edX
